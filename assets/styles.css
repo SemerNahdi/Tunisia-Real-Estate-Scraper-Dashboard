@@ -1,0 +1,129 @@
+/* Global Styles */
+body {
+  background-color: white;
+  font-family: "Helvetica Neue", sans-serif;
+  color: black;
+}
+
+/* Container Styling */
+.container-fluid {
+  background-color: white;
+  padding: 20px;
+}
+
+/* Card Styling */
+.card {
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  border-color: #333;
+}
+
+.card-title {
+  color: #000000;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.card:hover .card-title {
+  color: #333;
+}
+
+.card-text {
+  color: #000000;
+  transition: color 0.3s ease;
+}
+
+.card:hover .card-text {
+  color: #333;
+}
+
+/* Header */
+.text-center {
+  color: #000000 !important;
+  margin-bottom: 30px;
+}
+
+/* Graph Styles */
+.dash-spacer {
+  margin: 10px 0;
+}
+
+/* Column Spacing */
+.dash-row {
+  margin-bottom: 20px;
+}
+
+/* Graph Container */
+.js-plotly-plot {
+  background-color: white !important;
+  border-radius: 10px;
+  border: 2px solid #000000;
+  transition: all 0.3s ease;
+}
+
+.js-plotly-plot:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Dashboard Container */
+.dash-graph {
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.dash-graph:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Row and Column Spacing */
+.row {
+  margin-bottom: 20px;
+}
+
+.col {
+  padding: 10px;
+}
+
+/* Title Styling */
+h1 {
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #000000;
+  padding-bottom: 10px;
+}
+
+/* Metric Card Specific */
+.metric-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.metric-card .card-title {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+.metric-card .card-text {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.metric-card:hover {
+  background-color: #f8f8f8;
+}
