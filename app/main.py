@@ -2,8 +2,8 @@
 
 from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
-from data_processor import load_data
-from graphs import (
+from app.data_processor import load_data
+from app.graphs import (
     create_pie_chart, create_bar_chart,
     create_delegation_chart, create_publisher_chart, create_type_chart
 )
