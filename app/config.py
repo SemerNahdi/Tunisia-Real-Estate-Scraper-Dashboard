@@ -1,3 +1,4 @@
-MONGO_URI = "mongodb://localhost:27017/"
-DB_NAME = "tayara"
-COLLECTION_NAME = "immo_neuf"
+import os
+
+class Config:
+    FASTAPI_URL = os.getenv("FASTAPI_URL", "http://127.0.0.1:8000")

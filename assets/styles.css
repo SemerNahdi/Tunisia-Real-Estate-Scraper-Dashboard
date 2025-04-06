@@ -112,6 +112,18 @@ h1 {
 .metric-card {
   text-align: center;
   padding: 20px;
+  margin: 20px;
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  background-color: #f8f8f8;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .metric-card .card-title {
@@ -124,6 +136,105 @@ h1 {
   font-weight: bold;
 }
 
-.metric-card:hover {
+/* New Listings Card Specific */
+.rounded-card {
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.rounded-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  border-color: #333;
+}
+
+.rounded-card .card-header {
+  background-color: white;
+  border-bottom: 1px solid #000000;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.rounded-card .card-body {
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* New Full-Width Listings Card */
+.full-width-card {
+  background-color: white;
+  border: 2px solid #000000;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px; /* Added bottom margin for spacing */
+  padding: 20px; /* Ensure padding is consistent with other cards */
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-top: 20px; /* Added top margin for spacing from elements above */
+}
+
+.full-width-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  border-color: #333;
+}
+
+.full-width-card .card-header {
+  background-color: white;
+  border-bottom: 1px solid #000000;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.full-width-card .card-body {
+  background-color: white;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+/* Button Styling */
+.btn-primary {
+  background-color: #000;
+  border-color: #000;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #333;
+  border-color: #333;
+}
+
+/* Table Styling (if needed) */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table th,
+.table td {
+  border-color: #000000;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
   background-color: #f8f8f8;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #e9ecef;
+}
+
+/* Full-Width Button Styling */
+.full-width-button {
+  width: 100%;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+  position: relative;
 }

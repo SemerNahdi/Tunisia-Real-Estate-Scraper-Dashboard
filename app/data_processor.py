@@ -1,25 +1,51 @@
-import pandas as pd
 import requests
+import logging
 
-# data_processor.py
+logger = logging.getLogger(__name__)
 
-import requests
-
-def load_data():
+def load_data(url):
     try:
-        response = requests.get("http://127.0.0.1:8000/statistics")
+        response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            # print(data)  # Debug print to check the structure
+            logger.debug("Data fetched successfully.")
             return data
         else:
-            print(f"Error: Received status code {response.status_code}")
+            logger.error(f"Error: Received status code {response.status_code}")
             return {}
     except Exception as e:
-        print(f"Error fetching data: {e}")
+        logger.error(f"Error fetching data: {e}")
         return {}
 
+def load_new_listings(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            logger.debug("New listings fetched successfully.")
+            # print(data)
+            return data
+        else:
+            logger.error(f"Error: Received status code {response.status_code}")
+            return {}
+    except Exception as e:
+        logger.error(f"Error fetching new listings: {e}")
+        return {}
 
+def load_statistics(url):
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            logger.debug("Statistics data fetched successfully.")
+            
+            return data
+        else:
+            logger.error(f"Error: Received status code {response.status_code}")
+            return {}
+    except Exception as e:
+        logger.error(f"Error fetching statistics data: {e}")
+        return {}
 
 def clean_data(data):
     """Clean and preprocess the data if needed."""
