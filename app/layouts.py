@@ -7,6 +7,9 @@ from .graphs import (
     create_type_chart
 )
 import pandas as pd
+import requests
+from .config import Config
+from .utils import logger
 
 def create_layout(statistics_data, new_listings_data):
     if not isinstance(statistics_data, dict) or not isinstance(new_listings_data, dict):
@@ -31,7 +34,7 @@ def create_layout(statistics_data, new_listings_data):
         html.H1("Tunisian Real Estate Dashboard", className="text-center my-4"),
         
         # Key Metrics Cards
-        dbc.Row([  # Key metrics row (Total Listings, Avg Sale Price, etc.)
+        dbc.Row([
             dbc.Col(
                 dbc.Card([
                     html.H4("Total Listings", className="card-title"),
@@ -63,16 +66,19 @@ def create_layout(statistics_data, new_listings_data):
         ], className="mb-5"),
         
         # Bento Grid Layout
-        dbc.Row([  # Bento grid (charts)
-            dbc.Col([  # Left column (charts)
-                dbc.Card([ 
+        dbc.Row([
+            # Left Column
+            dbc.Col([
+                # Governorate Distribution Chart
+                dbc.Card([
                     dcc.Graph(
                         id='governorate-pie',
                         figure=create_pie_chart(governorate_stats, "Listings by Governorate")
                     )
                 ], body=True, className="mb-4"),
                 
-                dbc.Card([  
+                # Publisher Type Distribution
+                dbc.Card([
                     dcc.Graph(
                         id='publisher-chart',
                         figure=create_publisher_chart(publisher_stats)
@@ -80,15 +86,18 @@ def create_layout(statistics_data, new_listings_data):
                 ], body=True)
             ], md=6),
             
-            dbc.Col([  # Right column (charts)
-                dbc.Card([  
+            # Right Column
+            dbc.Col([
+                # Type Distribution Chart (Donut)
+                dbc.Card([
                     dcc.Graph(
                         id='type-chart',
                         figure=create_type_chart(type_stats)
                     )
                 ], body=True, className="mb-4"),
                 
-                dbc.Card([  
+                # Top Delegations Chart
+                dbc.Card([
                     dcc.Graph(
                         id='delegation-chart',
                         figure=create_delegation_chart(delegation_data)
@@ -97,23 +106,47 @@ def create_layout(statistics_data, new_listings_data):
             ], md=6)
         ]),
         
-        # New Listings Card (Full Width)
-        dbc.Row([  # Full-width row for the button
-            dbc.Col([  
+        # Navigation Buttons in Cards
+        dbc.Row([
+            dbc.Col([
                 dbc.Card([
-                    html.H4("New Listings", className="card-title"),
-                    html.H2(f"{new_count:,} New Listings", className="card-text"),
-                    dbc.Button(
-                        "View New Listings",
-                        href="/new-listings",
-                        color="primary",
-                        className="mt-4 full-width-button"
-                    )
-                ], body=True, className="metric-card full-width-card"),
-            ], md=12)
-        ]),
+                    dbc.CardBody([
+                        dbc.Button(
+                            "View New Listings",
+                            href="/new-listings",
+                            color="primary",
+                            className="w-100 mt-2"
+                        )
+                    ], className="p-0")
+                ], className="mb-4 metric-card")
+            ], md=4),
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        dbc.Button(
+                            "Filter by Price",
+                            href="/price-filter",
+                            color="primary",
+                            className="w-100 mt-2"
+                        )
+                    ], className="p-0")
+                ], className="mb-4 metric-card")
+            ], md=4),
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        dbc.Button(
+                            "Back to Dashboard",
+                            href="/",
+                            color="secondary",
+                            className="w-100 mt-2"
+                        )
+                    ], className="p-0")
+                ], className="mb-4 metric-card")
+            ], md=4)
+        ])
     ], fluid=True, className="dashboard-container")
-  
+
 def create_new_listings_layout(new_listings_data):
     new_annonces = new_listings_data.get('new_annonces', [])
     new_count = new_listings_data.get('count', 0)
@@ -124,13 +157,17 @@ def create_new_listings_layout(new_listings_data):
             html.H4(f"Total New Listings: {new_count}", className="text-center my-2"),
             html.P("No new listings found.", className="text-center my-2"),
             dbc.Row([
-                dbc.Col([  # Move back button to center
-                    dbc.Button(
-                        "Back to Dashboard",
-                        href="/",
-                        color="secondary",
-                        className="mt-4"
-                    )
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardBody([
+                            dbc.Button(
+                                "Back to Dashboard",
+                                href="/",
+                                color="secondary",
+                                className="w-100 mt-2"
+                            )
+                        ], className="p-0")
+                    ], className="mb-4 metric-card")
                 ], md=12, className="text-center")
             ])
         ], fluid=True, className="dashboard-container")
@@ -152,18 +189,91 @@ def create_new_listings_layout(new_listings_data):
         html.H1("New Listings", className="text-center my-4"),
         html.H4(f"Total New Listings: {new_count}", className="text-center my-2"),
         
-        # Move the "Back to Dashboard" button to the top-left corner using custom CSS
+        # Back to Dashboard Button in Card
         dbc.Row([
             dbc.Col([
-                dbc.Button(
-                    "Back to Dashboard",
-                    href="/",
-                    color="secondary",
-                    className="mt-4",
-                    style={'position': 'absolute', 'top': '10px', 'left': '10px'}
+                dbc.Card([
+                    dbc.CardBody([
+                        dbc.Button(
+                            "Back to Dashboard",
+                            href="/",
+                            color="secondary",
+                            className="w-100 mt-2"
+                        )
+                    ], className="p-0")
+                ], className="mb-4 metric-card")
+            ], md=12, className="text-center")
+        ]),
+        
+        dbc.Row(listings_cards, className="justify-content-center"),
+    ], fluid=True, className="dashboard-container")
+
+def create_price_filter_layout():
+    return dbc.Container([
+        html.H1("Filter Listings by Price", className="text-center my-4"),
+        
+        # Back to Dashboard Button in Card
+        dbc.Row([
+            dbc.Col([
+                dbc.Card([
+                    dbc.CardBody([
+                        dbc.Button(
+                            "Back to Dashboard",
+                            href="/",
+                            color="secondary",
+                            className="w-100 mt-2"
+                        )
+                    ], className="p-0")
+                ], className="mb-4 metric-card")
+            ], md=12, className="text-center")
+        ]),
+        
+        # Price Range Inputs
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Minimum Price (TND)", className="mb-2"),
+                dbc.Input(
+                    id='min-price-input',
+                    type='number',
+                    value=0,
+                    min=0,
+                    className="mb-4"
+                )
+            ], md=6),
+            dbc.Col([
+                dbc.Label("Maximum Price (TND)", className="mb-2"),
+                dbc.Input(
+                    id='max-price-input',
+                    type='number',
+                    value=1_000_000,
+                    min=0,
+                    className="mb-4"
+                )
+            ], md=6)
+        ]),
+        
+        # Product Type Selector
+        dbc.Row([
+            dbc.Col([
+                dbc.Label("Product Type", className="mb-2"),
+                dbc.RadioItems(
+                    id='product-type-selector',
+                    options=[
+                        {"label": "Sale", "value": 1},
+                        {"label": "Rent", "value": 0},
+                        {"label": "Both", "value": None}
+                    ],
+                    value=None,
+                    inline=True,
+                    className="mb-4"
                 )
             ], md=12)
         ]),
         
-        dbc.Row(listings_cards, className="justify-content-center"),
+        # Listings Display
+        dbc.Row([
+            dbc.Col([
+                html.Div(id='price-filter-results', className="mt-4")
+            ], md=12)
+        ])
     ], fluid=True, className="dashboard-container")

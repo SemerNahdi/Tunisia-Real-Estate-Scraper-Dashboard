@@ -238,3 +238,23 @@ h1 {
 .dashboard-container {
   position: relative;
 }
+/* Softer alternating row colors */
+.table-soft-light {
+  background-color: #f7f7f7; /* Soft light gray */
+}
+
+.table-soft-dark {
+  background-color: #e1e1e1; /* Slightly darker soft gray */
+}
+
+/* Rounded corners for the table */
+.rounded-table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Optional: Adding padding to table cells for better readability */
+.table td,
+.table th {
+  padding: 15px;
+}

@@ -1,5 +1,6 @@
 import requests
 import logging
+from .config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +24,6 @@ def load_new_listings(url):
         if response.status_code == 200:
             data = response.json()
             logger.debug("New listings fetched successfully.")
-            # print(data)
             return data
         else:
             logger.error(f"Error: Received status code {response.status_code}")
@@ -38,13 +38,34 @@ def load_statistics(url):
         if response.status_code == 200:
             data = response.json()
             logger.debug("Statistics data fetched successfully.")
-            
             return data
         else:
             logger.error(f"Error: Received status code {response.status_code}")
             return {}
     except Exception as e:
         logger.error(f"Error fetching statistics data: {e}")
+        return {}
+
+def fetch_filtered_listings(min_price, max_price, producttype):
+    url = f"{Config.FASTAPI_URL}/annonces/price"
+    params = {
+        "min_price": min_price,
+        "max_price": max_price,
+        "producttype": producttype,
+        "skip": 0,
+        "limit": 100  # Adjust limit as needed
+    }
+    try:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            logger.debug("Filtered listings fetched successfully.")
+            return data
+        else:
+            logger.error(f"Error: Received status code {response.status_code}")
+            return {}
+    except Exception as e:
+        logger.error(f"Error fetching filtered listings: {e}")
         return {}
 
 def clean_data(data):
