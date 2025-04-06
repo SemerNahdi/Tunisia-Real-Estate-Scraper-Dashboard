@@ -1,260 +1,233 @@
+/* CSS Variables for Theme */
+:root {
+  /* Pastel Color Palette */
+  --pastel-blue: #a7c7e7; /* Soft sky blue */
+  --pastel-pink: #ffb3ba; /* Bubblegum pink */
+  --pastel-mint: #98ddca; /* Seafoam green */
+  --pastel-lavender: #c3b1e1; /* Soft purple */
+  --pastel-peach: #ffd8b1; /* Warm peach */
+  --pastel-ice: #b0e0e6; /* Powder blue */
+
+  /* Theme Assignments */
+  --primary-color: var(--pastel-blue);
+  --secondary-color: var(--pastel-pink);
+  --accent-color: var(--pastel-mint);
+  --success-color: #c1e1c1; /* Pastel green */
+  --warning-color: #faf3dd; /* Pale yellow */
+  --danger-color: #ffcccb; /* Salmon pink */
+
+  /* Neutrals */
+  --background-color: #f9f9f9;
+  --text-color: #4a4a4a;
+  --border-color: #e0e0e0;
+
+  /* Sizing */
+  --border-radius: 12px;
+  --spacing-unit: 1rem;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+/* Pastel Borders */
+.pastel-border-blue {
+  border-left: 4px solid var(--pastel-blue);
+}
+.pastel-border-mint {
+  border-left: 4px solid var(--pastel-mint);
+}
+.pastel-border-peach {
+  border-left: 4px solid var(--pastel-peach);
+}
+.pastel-border-pink {
+  border-left: 4px solid var(--pastel-pink);
+}
+
+/* Text Colors */
+.text-pastel-blue {
+  color: var(--pastel-blue);
+}
+.text-pastel-mint {
+  color: var(--pastel-mint);
+}
+.text-pastel-peach {
+  color: var(--pastel-peach);
+}
+.text-pastel-pink {
+  color: var(--pastel-pink);
+}
+
+/* Hover Effects */
+.metric-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.9);
+}
 /* Global Styles */
 body {
-  background-color: white;
-  font-family: "Helvetica Neue", sans-serif;
-  color: black;
+  background-color: var(--background-color);
+  font-family: "Inter", sans-serif;
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
-/* Container Styling */
-.container-fluid {
-  background-color: white;
-  padding: 20px;
-}
-
-/* Card Styling */
+/* Enhanced Card Design */
 .card {
-  background-color: white;
-  border: 2px solid #000000;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-  cursor: pointer;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  border-color: #333;
+.card-header {
+  background: var(--pastel-ice);
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.card-title {
-  color: #000000;
-  font-weight: bold;
-  transition: color 0.3s ease;
+/* Unified Buttons */
+.btn {
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
 }
 
-.card:hover .card-title {
-  color: #333;
+.btn-primary {
+  background: var(--pastel-blue);
+  color: white;
 }
 
-.card-text {
-  color: #000000;
-  transition: color 0.3s ease;
+.btn-secondary {
+  background: var(--pastel-pink);
+  color: white;
 }
 
-.card:hover .card-text {
-  color: #333;
+.btn-success {
+  background: var(--success-color);
+  color: var(--text-color);
 }
 
-/* Header */
-.text-center {
-  color: #000000 !important;
-  margin-bottom: 30px;
-}
-
-/* Graph Styles */
-.dash-spacer {
-  margin: 10px 0;
-}
-
-/* Column Spacing */
-.dash-row {
-  margin-bottom: 20px;
-}
-
-/* Graph Container */
-.js-plotly-plot {
-  background-color: white !important;
-  border-radius: 10px;
-  border: 2px solid #000000;
-  transition: all 0.3s ease;
-}
-
-.js-plotly-plot:hover {
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Dashboard Container */
-.dash-graph {
-  background-color: white;
-  border: 2px solid #000000;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-}
-
-.dash-graph:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Row and Column Spacing */
-.row {
-  margin-bottom: 20px;
-}
-
-.col {
-  padding: 10px;
-}
-
-/* Title Styling */
-h1 {
-  color: #000000;
-  font-weight: bold;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #000000;
-  padding-bottom: 10px;
-}
-
-/* Metric Card Specific */
+/* Metric Cards */
 .metric-card {
-  text-align: center;
-  padding: 20px;
-  margin: 20px;
-  background-color: white;
-  border: 2px solid #000000;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  background: white;
+  border: 2px solid var(--pastel-ice);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
 }
 
 .metric-card:hover {
-  background-color: #f8f8f8;
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  background: var(--pastel-ice);
+  border-color: var(--pastel-blue);
 }
 
-.metric-card .card-title {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
+/* Listings Cards */
+.listing-card {
+  background: white;
+  border-left: 4px solid var(--pastel-pink);
+  transition: transform 0.2s ease;
 }
 
-.metric-card .card-text {
-  font-size: 2rem;
-  font-weight: bold;
+.listing-card:hover {
+  transform: translateX(4px);
+  background: rgba(255, 179, 186, 0.05);
 }
 
-/* New Listings Card Specific */
-.rounded-card {
-  background-color: white;
-  border: 2px solid #000000;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.rounded-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  border-color: #333;
-}
-
-.rounded-card .card-header {
-  background-color: white;
-  border-bottom: 1px solid #000000;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.rounded-card .card-body {
-  background-color: white;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-/* New Full-Width Listings Card */
-.full-width-card {
-  background-color: white;
-  border: 2px solid #000000;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 40px; /* Added bottom margin for spacing */
-  padding: 20px; /* Ensure padding is consistent with other cards */
-  transition: all 0.3s ease;
-  cursor: pointer;
-  margin-top: 20px; /* Added top margin for spacing from elements above */
-}
-
-.full-width-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-  border-color: #333;
-}
-
-.full-width-card .card-header {
-  background-color: white;
-  border-bottom: 1px solid #000000;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-}
-
-.full-width-card .card-body {
-  background-color: white;
-  border-bottom-left-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-/* Button Styling */
-.btn-primary {
-  background-color: #000;
-  border-color: #000;
-  transition: background-color 0.2s, border-color 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #333;
-  border-color: #333;
-}
-
-/* Table Styling (if needed) */
-.table {
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.table th,
-.table td {
-  border-color: #000000;
+/* Tables */
+.rounded-table th {
+  background: var(--pastel-ice);
+  color: var(--text-color);
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
-  background-color: #f8f8f8;
+  background-color: rgba(176, 224, 230, 0.1); /* Pastel ice */
 }
 
-.table-hover tbody tr:hover {
-  background-color: #e9ecef;
+/* Form Elements */
+.form-control {
+  border: 1px solid var(--border-color);
+  transition: all 0.2s ease;
 }
 
-/* Full-Width Button Styling */
-.full-width-button {
-  width: 100%;
+.form-control:focus {
+  border-color: var(--pastel-blue);
+  box-shadow: 0 0 0 3px rgba(167, 199, 231, 0.25);
 }
 
-/* Dashboard Container */
-.dashboard-container {
-  position: relative;
-}
-/* Softer alternating row colors */
-.table-soft-light {
-  background-color: #f7f7f7; /* Soft light gray */
+/* Colorful Highlights */
+.price-highlight {
+  color: var(--pastel-blue);
+  font-weight: 700;
 }
 
-.table-soft-dark {
-  background-color: #e1e1e1; /* Slightly darker soft gray */
+/* Navigation Buttons */
+.nav-btn {
+  background: rgba(167, 199, 231, 0.1);
+  border: 1px solid var(--pastel-blue);
+  color: var(--pastel-blue);
 }
 
-/* Rounded corners for the table */
-.rounded-table {
-  border-radius: 10px;
-  overflow: hidden;
+.nav-btn:hover {
+  background: var(--pastel-blue);
+  color: white;
 }
 
-/* Optional: Adding padding to table cells for better readability */
-.table td,
-.table th {
-  padding: 15px;
+/* Chart Cards */
+.chart-card {
+  background: white;
+  border: 1px solid rgba(176, 224, 230, 0.5);
+}
+/* Custom CSS for these specific metric cards */
+.metric-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border-left: 4px solid;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.metric-title {
+  color: #4a4a4a;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.metric-value {
+  color: #2d4059;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Color Variations */
+.total-listings {
+  border-color: #a7c7e7;
+}
+.avg-sale {
+  border-color: #98ddca;
+}
+.avg-rent {
+  border-color: #ffd8b1;
+}
+.shop-listings {
+  border-color: #ffb3ba;
+}
+.back-btn {
+  border: 1px solid var(--pastel-blue);
+  color: var(--pastel-blue);
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  background: rgba(167, 199, 231, 0.1);
+}
+
+.back-btn:hover {
+  background: var(--pastel-blue);
+  color: white;
+  transform: translateX(-3px);
 }
