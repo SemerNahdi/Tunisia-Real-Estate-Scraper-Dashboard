@@ -143,10 +143,39 @@ def create_layout(statistics_data, new_listings_data):
                     ])
                 ], className="chart-card")
             ], md=6)
-        ], className="g-4")
+        ], className="g-4"),
+
+        # Navigation Buttons
+        dbc.Row([
+            dbc.Col(
+                dbc.Button(
+                    "✨ View New Listings",
+                    href="/new-listings",
+                    color="primary",
+                    className="nav-btn hover-scale py-3"
+                ), md=4, className="mb-3"
+            ),
+            dbc.Col(
+                dbc.Button(
+                    "🔍 Filter by Price",
+                    href="/price-filter",
+                    color="secondary",
+                    className="nav-btn hover-scale py-3"
+                ), md=4, className="mb-3"
+            ),
+            dbc.Col(
+                dbc.Button(
+                    "🏡 Back to Dashboard",
+                    href="/",
+                    color="light",
+                    className="nav-btn hover-scale py-3"
+                ), md=4, className="mb-3"
+            )
+        ], className="justify-content-center")
     ], fluid=True, className="dashboard-container p-4")
+
     ])
-    
+
 
 # --------------------------- New Listings Layout ---------------------------
 def create_new_listings_layout(new_listings_data):
