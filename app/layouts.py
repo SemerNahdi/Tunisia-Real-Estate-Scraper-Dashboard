@@ -263,7 +263,7 @@ def create_price_filter_layout():
                                     dbc.Input(
                                         id='min-price-input',
                                         type='number',
-                                        value=0,
+                                        value=100,
                                         min=0,
                                         className="form-control"
                                     )
