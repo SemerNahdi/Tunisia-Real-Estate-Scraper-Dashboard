@@ -2,11 +2,15 @@ from dash import Dash, dcc, html, Input, Output, callback
 import dash_bootstrap_components as dbc
 from .config import Config
 from .data_processor import load_statistics, load_new_listings, fetch_filtered_listings, clean_data
-from .layouts import create_layout, create_new_listings_layout, create_price_filter_layout
+from .layouts import create_layout, create_navigation_header, create_new_listings_layout, create_price_filter_layout , create_listing_details_layout
 from datetime import datetime
 
 # Initialize the app
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, '/assets/styles.css'])
+app = Dash(__name__, external_stylesheets=[
+    dbc.themes.BOOTSTRAP,
+    '/assets/styles.css',
+    'https://use.fontawesome.com/releases/v5.15.4/css/all.css'
+])
 
 # Load and process data
 url_statistics = f"{Config.FASTAPI_URL}/statistics"
@@ -31,6 +35,9 @@ def display_page(pathname):
         return create_new_listings_layout(new_listings_data)
     elif pathname == '/price-filter':
         return create_price_filter_layout()
+    elif pathname.startswith('/listings/'):
+        listing_id = pathname.split('/')[-1]
+        return create_listing_details_layout(listing_id)
     else:
         return html.Div("404: Page Not Found")
 
@@ -53,7 +60,7 @@ def update_filtered_listings(min_price, max_price, producttype):
             html.P("No listings found.", className="text-center my-2")
         ])
     
-    # Table header without the Listing ID
+    # Table header with all columns including ID
     table_header = [
         html.Thead(
             html.Tr([
@@ -61,7 +68,8 @@ def update_filtered_listings(min_price, max_price, producttype):
                 html.Th("Price"),
                 html.Th("Location"),
                 html.Th("Description"),
-                html.Th("Published On")
+                html.Th("Published On"),
+                html.Th("Actions")
             ])
         )
     ]
@@ -69,6 +77,7 @@ def update_filtered_listings(min_price, max_price, producttype):
     # Table body with alternating row colors
     table_rows = []
     for i, annonce in enumerate(annonces):
+        listing_id = annonce.get('id', 'N/A')
         # Format the publication date
         published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
         if published_on != 'N/A':
@@ -78,20 +87,41 @@ def update_filtered_listings(min_price, max_price, producttype):
             except ValueError:
                 published_on = 'Invalid Date'
         
+        # Get location details
+        location = annonce.get('location', {})
+        location_str = f"{location.get('governorate', 'N/A')}, {location.get('delegation', 'N/A')}"
+        
+        # Get description and truncate if necessary
+        description = annonce.get('description', 'N/A')
+        if description != 'N/A':
+            description = f"{description[:100]}..." if len(description) > 100 else description
+        
         # Alternate row classes
         row_class = "table-soft-light" if i % 2 == 0 else "table-soft-dark"
         
-        # Add rows to the table
+        # Create table row with separate columns and a button
         table_rows.append(
             html.Tr(
-                className=row_class,
+                className=f"{row_class}",
                 children=[
                     html.Td(annonce.get('title', 'N/A')),
                     html.Td(f"{annonce.get('price', 'N/A')} TND"),
-                    html.Td(f"{annonce.get('location', {}).get('governorate', 'N/A')}, "
-                            f"{annonce.get('location', {}).get('delegation', 'N/A')}"),
-                    html.Td(f"{annonce.get('description', 'N/A')[:100]}..."),
-                    html.Td(published_on)
+                    html.Td(location_str),
+                    html.Td(description),
+                    html.Td(published_on),
+                    html.Td(
+                        dbc.Button(
+                            "View Details",
+                            id=f"view-details-{listing_id}",
+                            href=f"/listings/{listing_id}",
+                            color="primary",
+                            size="sm",
+                            className="view-details-btn",
+                            external_link=True,
+                            n_clicks=0
+                        ),
+                        className="text-center"
+                    )
                 ]
             )
         )

@@ -15,6 +15,17 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Style the view details button */
+.view-details-btn {
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.view-details-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* Navigation Styles */
 .nav-header {
     background-color: white;
@@ -131,4 +142,47 @@ body {
 .back-btn:hover {
     background-color: var(--primary-color);
     color: white;
+}
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.py-4 {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
+.shadow-sm {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.lead {
+    font-size: 1.1rem;
+}
+
+.carousel img {
+    max-height: 400px;
+    object-fit: cover;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .text-md-end {
+        text-align: left !important;
+    }
+    .carousel img {
+        max-height: 300px;
+    }
 }

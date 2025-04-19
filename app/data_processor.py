@@ -53,7 +53,7 @@ def fetch_filtered_listings(min_price, max_price, producttype):
         "max_price": max_price,
         "producttype": producttype,
         "skip": 0,
-        "limit": 100  # Adjust limit as needed
+        "limit": 100  
     }
     try:
         response = requests.get(url, params=params)
@@ -67,6 +67,38 @@ def fetch_filtered_listings(min_price, max_price, producttype):
     except Exception as e:
         logger.error(f"Error fetching filtered listings: {e}")
         return {}
+
+def fetch_listing_details(listing_id):
+    """Fetch details for a single listing from the FastAPI endpoint."""
+    url = f"{Config.FASTAPI_URL}/annonces/{listing_id}"
+    logger.info(f"Fetching listing details from URL: {url}")
+    try:
+        response = requests.get(url)
+        logger.debug(f"Response status code: {response.status_code}")
+        
+        if response.status_code == 200:
+            data = response.json()
+            logger.debug(f"Response data keys: {list(data.keys())}")
+            
+            listing = data.get('listing')
+            if listing:
+                logger.info(f"Successfully fetched listing {listing_id} with title: {listing.get('title', 'N/A')}")
+                return listing
+            else:
+                logger.warning(f"No listing data found for listing_id: {listing_id}")
+                return None
+        
+        elif response.status_code == 404:
+            logger.warning(f"Listing not found for listing_id: {listing_id}")
+            return None
+        
+        else:
+            logger.error(f"Unexpected status code {response.status_code} for listing_id: {listing_id}")
+            return None
+    
+    except Exception as e:
+        logger.error(f"Exception while fetching listing {listing_id}: {str(e)}")
+        return None
 
 def clean_data(data):
     """Clean and preprocess the data if needed."""

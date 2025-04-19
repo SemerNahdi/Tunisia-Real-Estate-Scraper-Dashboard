@@ -12,9 +12,12 @@ from .graphs import (
     create_publisher_chart,
     create_type_chart
 )
+from datetime import datetime
 from .config import Config
 from .utils import logger
+from .data_processor import fetch_listing_details
 import pandas as pd
+import json
 
 
 # --------------------------- Navigation Header ---------------------------
@@ -199,6 +202,138 @@ def create_new_listings_layout(new_listings_data):
         ], fluid=True, className="dashboard-container p-4")
     ])
 
+# --------------------------- Listing Details Layout ---------------------------
+def create_listing_details_layout(listing_id):
+    """Create styled layout for listing details with badges."""
+    data = fetch_listing_details(listing_id)
+    
+    if not data:
+        return dbc.Container([
+            create_navigation_header('/listings'),
+            html.H3("Listing Not Found", className="text-center my-4"),
+            dbc.Button(
+                "← Back to Price Filter",
+                href="/price-filter",
+                color="primary",
+                className="btn btn-primary d-flex align-items-center mx-auto",
+                style={"borderRadius": "20px"}
+            )
+        ], fluid=True, className="dashboard-container p-4")
+    
+    listing = data.get('listing', {})
+    
+    # Process images for carousel
+    images = listing.get('images', [])
+    carousel_items = [
+        {
+            "key": f"image-{i}",
+            "src": img,
+            "header": f"Image {i+1}",
+            "img_style": {"width": "100%", "height": "500px", "objectFit": "cover"}
+        } for i, img in enumerate(images)
+    ]
+    
+    # Format date
+    published_date = listing.get('metadata', {}).get('publishedOn', 'N/A')
+    if published_date != 'N/A':
+        published_date = datetime.fromisoformat(published_date.replace('Z', '+00:00')).strftime('%B %d, %Y')
+
+    # Property type, publisher type, and status for badges
+    property_type = "Rent" if listing.get('metadata', {}).get('producttype') == 0 else "Sale"
+    publisher_type = "Shop" if listing.get('metadata', {}).get('publisher', {}).get('isShop') else "Individual"
+    status = "Modified" if listing.get('metadata', {}).get('isModified') else "Original"
+
+    return html.Div([
+        create_navigation_header('/listings'),
+        dbc.Container([
+            # Header Row
+            dbc.Row([
+                dbc.Col(
+                    dbc.Button(
+                        "← Back to Price Filter",
+                        href="/price-filter",
+                        color="light",
+                        className="back-btn py-2"
+                    ), md=2, className="ps-4 pt-3"
+                ),
+                dbc.Col(
+                    html.H1("🏠 Listing Details", className="emoji-header mb-0 text-center"),
+                    md=8, className="pt-3"
+                ),
+                dbc.Col(md=2)
+            ], className="align-items-center mb-4"),
+
+            # Carousel
+            dbc.Card([
+                dbc.CardBody([
+                    dbc.Carousel(
+                        items=carousel_items,
+                        controls=True,
+                        indicators=True,
+                        interval=4000,
+                        className="listing-carousel"
+                    ) if images else html.P("No images available", className="text-center")
+                ])
+            ], className="mb-4 shadow-sm", style={"borderRadius": "10px"}),
+
+            # Main Info Card
+            dbc.Card([
+                dbc.CardBody([
+                    html.H3(listing.get('title', 'N/A'), className="text-primary mb-4", style={"fontWeight": "600"}),
+                    dbc.Row([
+                        dbc.Col([
+                            html.H4("💰 Price", className="mb-3"),
+                            html.P(f"{listing.get('price', 'N/A')} TND", className="lead"),
+                            html.H4("📍 Location", className="mb-3 mt-4"),
+                            html.P([
+                                f"{listing.get('location', {}).get('governorate', 'N/A')}, ",
+                                f"{listing.get('location', {}).get('delegation', 'N/A')}"
+                            ], className="lead")
+                        ], md=6),
+                        dbc.Col([
+                            html.H4("📅 Published On", className="mb-3"),
+                            html.P(published_date, className="lead"),
+                            html.H4("👤 Publisher", className="mb-3 mt-4"),
+                            html.P(listing.get('metadata', {}).get('publisher', {}).get('name', 'N/A'), className="lead")
+                        ], md=6)
+                    ]),
+                    html.Hr(className="my-4"),
+                    html.H4("📝 Description", className="mb-3"),
+                    html.P(listing.get('description', 'N/A'), className="lead", style={"lineHeight": "1.6"}),
+                    html.Hr(className="my-4"),
+                    dbc.Row([
+                        dbc.Col([
+                            html.H4("Additional Details", className="mb-3"),
+                            html.P([
+                                "🏷️ Property Type: ",
+                                dbc.Badge(
+                                    property_type,
+                                    color="primary" if property_type == "Rent" else "success",
+                                    className="ms-2"
+                                )
+                            ], className="mb-2"),
+                            html.P([
+                                "🏪 Publisher Type: ",
+                                dbc.Badge(
+                                    publisher_type,
+                                    color="warning" if publisher_type == "Shop" else "secondary",
+                                    className="ms-2"
+                                )
+                            ], className="mb-2"),
+                            html.P([
+                                "✏️ Status: ",
+                                dbc.Badge(
+                                    status,
+                                    color="info" if status == "Original" else "danger",
+                                    className="ms-2"
+                                )
+                            ], className="mb-2")
+                        ])
+                    ])
+                ])
+            ], className="mb-4 shadow-sm", style={"borderRadius": "10px"})
+        ], fluid=True, className="dashboard-container p-4")
+    ])
 
 # --------------------------- Price Filter Layout ---------------------------
 def create_price_filter_layout():
