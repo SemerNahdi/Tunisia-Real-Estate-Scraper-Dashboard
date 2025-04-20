@@ -108,21 +108,20 @@ http://localhost:8050
 
 **## 📁 Project Structure**
 
-📂 Tunisia-Real-Estate-Scraper-Dashboard
-    📂 app
-        📂 assets
-          📄 styles.css
-        📄 config.py               # Application configuration
-        📄 main.py                 # Application entry point
-        📄 data_processor.py       # Data processing and analysis 
-        📄 graphs.py               
-        📄 layouts.py              # Dashboard layout components
-        📄 utils.py
-   📂 assests
-        📄 styles.css              # Custom CSS styles
-📄 requirements.txt                # Project dependencies
-📄 README.md
-
+Tunisia-Real-Estate-Scraper-Dashboard/
+│
+├── app/                                # 📦 Core Application Folder
+│   ├── assets/                         # 🎨 Static assets like CSS
+│   │   └── styles.css                  # 🎨 Custom dashboard styling
+│   ├── config.py                       # ⚙️ Global configuration settings
+│   ├── main.py                         # 🚀 Entry point for running the app
+│   ├── data_processor.py               # 🧹 Data cleaning and preprocessing logic
+│   ├── graphs.py                       # 📊 Functions to generate Plotly charts
+│   ├── layouts.py                      # 🧱 Page structure and layout components
+│   └── utils.py                        # 🛠️  Reusable helper functions
+│
+├── requirements.txt                    # 📦 Python dependencies
+├── README.md                           # 📘 Project overview and usage guide
 
 
 
