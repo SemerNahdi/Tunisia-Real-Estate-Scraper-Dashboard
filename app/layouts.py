@@ -11,20 +11,17 @@ from .graphs import (
     create_delegation_chart,
     create_publisher_chart,
     create_type_chart,
-    create_avg_price_line_chart,  # Add this import
-    create_stacked_bar_chart      # Add this import
+    create_avg_price_line_chart,
+    create_stacked_bar_chart
 )
 from datetime import datetime
 from .config import Config
 from .utils import logger
-from .data_processor import fetch_listing_details, fetch_governorates_delegations  # Add this import
+from .data_processor import fetch_listing_details, fetch_governorates_delegations
 import pandas as pd
 import json
 
-
-# --------------------------- Navigation Header ---------------------------
 def create_navigation_header(active_page='/'):
-    """Create the navigation bar header for all pages."""
     return dbc.Navbar(
         dbc.Container([
             dbc.Row([
@@ -50,7 +47,6 @@ def create_navigation_header(active_page='/'):
     )
 
 
-# --------------------------- Main Dashboard Layout ---------------------------
 def create_layout(statistics_data, new_listings_data):
     """Create the main dashboard layout with key metrics and charts."""
     if not isinstance(statistics_data, dict) or not isinstance(new_listings_data, dict):
