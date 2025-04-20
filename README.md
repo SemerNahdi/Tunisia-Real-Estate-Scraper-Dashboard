@@ -109,7 +109,7 @@ pip install -r requirements.txt
 
 cd app
 
-python main.py
+python -m app.main
 
 ```
 

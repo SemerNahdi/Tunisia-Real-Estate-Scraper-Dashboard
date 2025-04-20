@@ -69,7 +69,7 @@ def fetch_filtered_listings(min_price, max_price, producttype):
         return {}
 
 def fetch_listing_details(listing_id):
-<<<<<<< HEAD
+
     """Fetch details for a single listing."""
     url = f"{Config.FASTAPI_URL}/annonces/{listing_id}"
     try:
@@ -89,8 +89,7 @@ def fetch_listing_details(listing_id):
         logger.error(f"Error fetching listing details for listing_id {listing_id}: {e}")
         return None
 
-      
-=======
+
     """Fetch details for a single listing from the FastAPI endpoint."""
     url = f"{Config.FASTAPI_URL}/annonces/{listing_id}"
     logger.info(f"Fetching listing details from URL: {url}")
@@ -122,7 +121,6 @@ def fetch_listing_details(listing_id):
         logger.error(f"Exception while fetching listing {listing_id}: {str(e)}")
         return None
 
->>>>>>> 9f4b7810038880357bb281af02afc8b50c97a603
 def clean_data(data):
     """Clean and preprocess the data if needed."""
     # Any data cleaning (e.g., handle missing values)
