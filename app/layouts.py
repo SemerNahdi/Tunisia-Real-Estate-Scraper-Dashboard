@@ -210,25 +210,38 @@ def create_new_listings_layout(new_listings_data):
 
 # --------------------------- Listing Details Layout ---------------------------
 def create_listing_details_layout(listing_id):
-    """Create styled layout for listing details with badges."""
-    data = fetch_listing_details(listing_id)
+    """Create the layout for displaying detailed information about a listing."""
+    # Fetch listing details
+    listing = fetch_listing_details(listing_id)
     
-    if not data:
-        return dbc.Container([
-            create_navigation_header('/listings'),
-            html.H3("Listing Not Found", className="text-center my-4"),
-            dbc.Button(
-                "← Back to Price Filter",
-                href="/price-filter",
-                color="primary",
-                className="btn btn-primary d-flex align-items-center mx-auto",
-                style={"borderRadius": "20px"}
-            )
-        ], fluid=True, className="dashboard-container p-4")
+    # Debug logging
+    print(f"Fetched listing data: {listing}")  # Add this line for debugging
     
-    listing = data.get('listing', {})
-    
-    # Process images for carousel
+    if not listing:
+        return html.Div([
+            create_navigation_header(),
+            dbc.Container([
+                dbc.Alert(
+                    "Listing not found or unable to fetch details.",
+                    color="danger",
+                    className="mt-4 text-center"
+                ),
+                dbc.Button(
+                    "← Back to Search",
+                    href="/price-filter",
+                    color="primary",
+                    className="mt-3"
+                )
+            ])
+        ])
+
+    # Extract listing details with fallbacks
+    title = listing.get('title', 'N/A')
+    price = listing.get('price', 'N/A')
+    location = listing.get('location', {})
+    description = listing.get('description', 'N/A')
+    metadata = listing.get('metadata', {})
+    published_date = metadata.get('publishedOn', 'N/A')
     images = listing.get('images', [])
     carousel_items = [
         {
@@ -238,38 +251,35 @@ def create_listing_details_layout(listing_id):
             "img_style": {"width": "100%", "height": "500px", "objectFit": "cover"}
         } for i, img in enumerate(images)
     ]
-    
-    # Format date
-    published_date = listing.get('metadata', {}).get('publishedOn', 'N/A')
     if published_date != 'N/A':
-        published_date = datetime.fromisoformat(published_date.replace('Z', '+00:00')).strftime('%B %d, %Y')
+        try:
+            published_date = datetime.fromisoformat(published_date.replace('Z', '+00:00')).strftime('%B %d, %Y')
+        except ValueError:
+            published_date = 'Invalid Date'
 
-    # Property type, publisher type, and status for badges
-    property_type = "Rent" if listing.get('metadata', {}).get('producttype') == 0 else "Sale"
-    publisher_type = "Shop" if listing.get('metadata', {}).get('publisher', {}).get('isShop') else "Individual"
-    status = "Modified" if listing.get('metadata', {}).get('isModified') else "Original"
+    # Get property details
+    property_type = "Sale" if listing.get('producttype') == 1 else "Rent"
+    publisher_type = metadata.get('publisher', {}).get('type', 'N/A')
+    status = metadata.get('status', 'N/A')
 
     return html.Div([
-        create_navigation_header('/listings'),
+        create_navigation_header(),
         dbc.Container([
-            # Header Row
+            # Back button and title row
             dbc.Row([
                 dbc.Col(
                     dbc.Button(
-                        "← Back to Price Filter",
+                        "← Back to Search",
                         href="/price-filter",
                         color="light",
-                        className="back-btn py-2"
-                    ), md=2, className="ps-4 pt-3"
+                        className="back-btn py-2 shadow-sm"
+                    ), width="auto"
                 ),
                 dbc.Col(
-                    html.H1("🏠 Listing Details", className="emoji-header mb-0 text-center"),
-                    md=8, className="pt-3"
-                ),
-                dbc.Col(md=2)
-            ], className="align-items-center mb-4"),
-
-            # Carousel
+                    html.H2(title, className="text-center mb-0"),
+                    className="text-center"
+                )
+            ], className="mb-4 align-items-center"),
             dbc.Card([
                 dbc.CardBody([
                     dbc.Carousel(
@@ -282,30 +292,31 @@ def create_listing_details_layout(listing_id):
                 ])
             ], className="mb-4 shadow-sm", style={"borderRadius": "10px"}),
 
-            # Main Info Card
+            # Main content card
             dbc.Card([
                 dbc.CardBody([
-                    html.H3(listing.get('title', 'N/A'), className="text-primary mb-4", style={"fontWeight": "600"}),
+                    # Price and Location Row
                     dbc.Row([
                         dbc.Col([
                             html.H4("💰 Price", className="mb-3"),
-                            html.P(f"{listing.get('price', 'N/A')} TND", className="lead"),
+                            html.P(f"{price} TND", className="lead"),
                             html.H4("📍 Location", className="mb-3 mt-4"),
                             html.P([
-                                f"{listing.get('location', {}).get('governorate', 'N/A')}, ",
-                                f"{listing.get('location', {}).get('delegation', 'N/A')}"
+                                f"Governorate: {location.get('governorate', 'N/A')}",
+                                html.Br(),
+                                f"Delegation: {location.get('delegation', 'N/A')}"
                             ], className="lead")
                         ], md=6),
                         dbc.Col([
                             html.H4("📅 Published On", className="mb-3"),
                             html.P(published_date, className="lead"),
                             html.H4("👤 Publisher", className="mb-3 mt-4"),
-                            html.P(listing.get('metadata', {}).get('publisher', {}).get('name', 'N/A'), className="lead")
+                            html.P(metadata.get('publisher', {}).get('name', 'N/A'), className="lead")
                         ], md=6)
                     ]),
                     html.Hr(className="my-4"),
                     html.H4("📝 Description", className="mb-3"),
-                    html.P(listing.get('description', 'N/A'), className="lead", style={"lineHeight": "1.6"}),
+                    html.P(description, className="lead", style={"lineHeight": "1.6"}),
                     html.Hr(className="my-4"),
                     dbc.Row([
                         dbc.Col([
@@ -340,6 +351,7 @@ def create_listing_details_layout(listing_id):
             ], className="mb-4 shadow-sm", style={"borderRadius": "10px"})
         ], fluid=True, className="dashboard-container p-4")
     ])
+
 
 # --------------------------- Price Filter Layout ---------------------------
 def create_price_filter_layout():

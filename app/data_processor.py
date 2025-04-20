@@ -68,6 +68,7 @@ def fetch_filtered_listings(min_price, max_price, producttype):
         logger.error(f"Error fetching filtered listings: {e}")
         return {}
 
+
 def fetch_listing_details(listing_id):
     """Fetch details for a single listing from the FastAPI endpoint."""
     url = f"{Config.FASTAPI_URL}/annonces/{listing_id}"
@@ -78,15 +79,16 @@ def fetch_listing_details(listing_id):
         
         if response.status_code == 200:
             data = response.json()
-            logger.debug(f"Response data keys: {list(data.keys())}")
+            logger.debug(f"Response data: {data}")  # Add this line for debugging
             
-            listing = data.get('listing')
-            if listing:
-                logger.info(f"Successfully fetched listing {listing_id} with title: {listing.get('title', 'N/A')}")
-                return listing
-            else:
-                logger.warning(f"No listing data found for listing_id: {listing_id}")
-                return None
+            # Check if the data is wrapped in a 'listing' key
+            if isinstance(data, dict):
+                if 'listing' in data:
+                    return data['listing']
+                return data  # Return the entire response if it's the listing itself
+            
+            logger.warning(f"Unexpected data format: {data}")
+            return None
         
         elif response.status_code == 404:
             logger.warning(f"Listing not found for listing_id: {listing_id}")
@@ -99,6 +101,8 @@ def fetch_listing_details(listing_id):
     except Exception as e:
         logger.error(f"Exception while fetching listing {listing_id}: {str(e)}")
         return None
+
+
 
 def clean_data(data):
     """Clean and preprocess the data if needed."""
