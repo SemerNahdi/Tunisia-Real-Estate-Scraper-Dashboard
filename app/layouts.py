@@ -156,31 +156,115 @@ def create_all_listings_layout(avg_prices_df, distribution_df):
     return html.Div([
         create_navigation_header('/all-listings'),
         dbc.Container([
-            html.H1("📈 All Listings Analytics", className="emoji-header text-center my-4 p-3"),
+            # Header Row with enhanced styling
             dbc.Row([
+                dbc.Col(
+                    dbc.Button(
+                        "← Dashboard",
+                        href="/",
+                        color="light",
+                        className="back-btn py-2 shadow-sm"
+                    ), md=2, className="ps-4 pt-3"
+                ),
+                dbc.Col(
+                    html.H1("📈 All Listings Analytics", className="emoji-header mb-0 text-center"),
+                    md=8, className="pt-3"
+                ),
+                dbc.Col(md=2)
+            ], className="align-items-center mb-4"),
+
+            # Charts Row with enhanced styling
+            dbc.Row([
+                # Average Prices Chart
                 dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader("💰 Average Prices Over Time", className="chart-header"),
+                        dbc.CardHeader(
+                            html.H4(
+                                html.Span([
+                                    html.I(className="fas fa-chart-line me-2"),
+                                    "💰 Average Prices Over Time"
+                                ]),
+                                className="text-primary mb-0"
+                            ),
+                            className="bg-light"
+                        ),
                         dbc.CardBody([
                             dcc.Graph(
                                 id='avg-price-line-chart',
-                                figure=create_avg_price_line_chart(avg_prices_df)
+                                figure=create_avg_price_line_chart(avg_prices_df),
+                                className="shadow-sm"
                             )
-                        ])
-                    ], className="chart-card mb-4")
+                        ], className="p-4")
+                    ], className="chart-card shadow-sm mb-4", style={"borderRadius": "15px"})
                 ], md=6),
+
+                # Distribution Chart
                 dbc.Col([
                     dbc.Card([
-                        dbc.CardHeader("🏛️ Monthly Distribution by Property Type", className="chart-header"),
+                        dbc.CardHeader(
+                            html.H4(
+                                html.Span([
+                                    html.I(className="fas fa-chart-bar me-2"),
+                                    "🏛️ Monthly Distribution by Property Type"
+                                ]),
+                                className="text-primary mb-0"
+                            ),
+                            className="bg-light"
+                        ),
                         dbc.CardBody([
                             dcc.Graph(
                                 id='stacked-bar-chart',
-                                figure=create_stacked_bar_chart(distribution_df)
+                                figure=create_stacked_bar_chart(distribution_df),
+                                className="shadow-sm"
                             )
-                        ])
-                    ], className="chart-card mb-4")
+                        ], className="p-4")
+                    ], className="chart-card shadow-sm mb-4", style={"borderRadius": "15px"})
                 ], md=6)
-            ], className="g-4")
+            ], className="g-4 px-lg-5"),
+
+            # Additional Information Section
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader(
+                            html.H4(
+                                html.Span([
+                                    html.I(className="fas fa-info-circle me-2"),
+                                    "📊 Analytics Overview"
+                                ]),
+                                className="text-primary mb-0"
+                            ),
+                            className="bg-light"
+                        ),
+                        dbc.CardBody([
+                            html.P(
+                                "This dashboard provides insights into property price trends and listing distributions over time. "
+                                "Use these analytics to understand market patterns and make informed decisions.",
+                                className="lead text-muted"
+                            ),
+                            html.Hr(className="my-4"),
+                            dbc.Row([
+                                dbc.Col([
+                                    html.H5("📈 Price Trends", className="mb-3"),
+                                    html.P(
+                                        "Track average property prices across different time periods "
+                                        "to identify market trends and seasonal patterns.",
+                                        className="text-muted"
+                                    )
+                                ], md=6),
+                                dbc.Col([
+                                    html.H5("📊 Distribution Analysis", className="mb-3"),
+                                    html.P(
+                                        "Analyze the distribution of property types by month "
+                                        "to understand market composition and changes.",
+                                        className="text-muted"
+                                    )
+                                ], md=6)
+                            ])
+                        ], className="p-4")
+                    ], className="info-card shadow-sm mb-4", style={"borderRadius": "15px"})
+                ], md=12)
+            ], className="px-lg-5")
         ], fluid=True, className="dashboard-container p-4")
     ])
 
