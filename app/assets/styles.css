@@ -186,3 +186,64 @@ body {
         max-height: 300px;
     }
 }
+
+
+/* Price Filter Specific Styles */
+.custom-radio-group .form-check {
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.custom-radio-group .form-check:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.filter-card {
+    transition: all 0.3s ease;
+}
+
+.filter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+
+/* Date Filter Specific Styles */
+.date-picker-custom {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.date-picker-custom input {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+}
+
+.results-container {
+    transition: all 0.3s ease;
+}
+
+/* Dropdown custom styles */
+.Select-control {
+    border-radius: 6px !important;
+    border: 1px solid #ced4da !important;
+}
+
+.Select-control:hover {
+    border-color: #80bdff !important;
+}
+
+/* Initial message styling */
+#date-filter-results:not(:empty) {
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

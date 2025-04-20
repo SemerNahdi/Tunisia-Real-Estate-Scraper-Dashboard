@@ -1,9 +1,17 @@
-from dash import Dash, dcc, html, Input, Output, callback
+from dash import Dash, dcc, html, Input, Output, callback, State
 import dash_bootstrap_components as dbc
 from .config import Config
-from .data_processor import load_statistics, load_new_listings, fetch_filtered_listings, clean_data
-from .layouts import create_layout, create_navigation_header, create_new_listings_layout, create_price_filter_layout , create_listing_details_layout
+from .data_processor import load_statistics, load_new_listings, fetch_filtered_listings, clean_data, fetch_listings_by_date
+from .layouts import (
+    create_layout, 
+    create_navigation_header, 
+    create_new_listings_layout, 
+    create_price_filter_layout,
+    create_listing_details_layout,
+    create_date_filter_layout
+)
 from datetime import datetime
+from .utils import logger
 
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[
@@ -38,6 +46,8 @@ def display_page(pathname):
     elif pathname.startswith('/listings/'):
         listing_id = pathname.split('/')[-1]
         return create_listing_details_layout(listing_id)
+    elif pathname == '/date-filter':  
+        return create_date_filter_layout()
     else:
         return html.Div("404: Page Not Found")
 
@@ -140,6 +150,109 @@ def update_filtered_listings(min_price, max_price, producttype):
             className="rounded-table"
         )
     ])
+
+@callback(
+    Output('date-filter-results', 'children'),
+    [Input('date-filter-button', 'n_clicks')],
+    [State('date-range', 'start_date'),
+     State('date-range', 'end_date'),
+     State('location-selector', 'value'),
+     State('date-product-type-selector', 'value')],
+    prevent_initial_call=True
+)
+
+def update_date_filtered_listings(n_clicks, start_date, end_date, location, producttype):
+    print(f"Callback triggered with dates: {start_date} to {end_date}")  # Debug print
+    if not n_clicks or not start_date or not end_date:
+        return html.Div("Select dates and click search to view listings.", className="text-center my-4")
+    
+    try:
+        # Convert string dates to datetime objects
+        start_date = datetime.strptime(start_date.split('T')[0], '%Y-%m-%d')
+        end_date = datetime.strptime(end_date.split('T')[0], '%Y-%m-%d')
+        
+        # Fetch filtered data
+        data = fetch_listings_by_date(start_date, end_date, producttype)
+        annonces = data.get('annonces', [])
+        total = data.get('total', 0)
+        
+        if not annonces:
+            return html.Div([
+                html.H4(f"Total Listings: {total}", className="text-center my-2"),
+                html.P("No listings found for the selected criteria.", className="text-center my-2")
+            ])
+        
+        # Filter by location if selected
+        if location:
+            governorate, delegation = location.split('|')
+            annonces = [
+                a for a in annonces 
+                if a.get('location', {}).get('governorate') == governorate 
+                and a.get('location', {}).get('delegation') == delegation
+            ]
+        
+        # Create table header
+        table_header = [
+            html.Thead(
+                html.Tr([
+                    html.Th("Title"),
+                    html.Th("Price"),
+                    html.Th("Location"),
+                    html.Th("Published On"),
+                    html.Th("Actions")
+                ])
+            )
+        ]
+        
+        # Create table rows
+        table_rows = []
+        for i, annonce in enumerate(annonces):
+            listing_id = annonce.get('id', 'N/A')
+            published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
+            if published_on != 'N/A':
+                published_on = datetime.fromisoformat(published_on.replace('Z', '+00:00')).strftime('%B %d, %Y')
+            
+            location_str = f"{annonce.get('location', {}).get('governorate', 'N/A')}, {annonce.get('location', {}).get('delegation', 'N/A')}"
+            
+            row_class = "table-soft-light" if i % 2 == 0 else "table-soft-dark"
+            
+            table_rows.append(
+                html.Tr(
+                    className=row_class,
+                    children=[
+                        html.Td(annonce.get('title', 'N/A')),
+                        html.Td(f"{annonce.get('price', 'N/A')} TND"),
+                        html.Td(location_str),
+                        html.Td(published_on),
+                        html.Td(
+                            dbc.Button(
+                                "View Details",
+                                href=f"/listings/{listing_id}",
+                                color="primary",
+                                size="sm",
+                                className="view-details-btn"
+                            ),
+                            className="text-center"
+                        )
+                    ]
+                )
+            )
+        
+        return html.Div([
+            html.H4(f"Total Listings: {len(annonces)}", className="text-center my-2"),
+            dbc.Table(
+                children=[*table_header, html.Tbody(children=table_rows)],
+                bordered=True,
+                hover=True,
+                responsive=True,
+                striped=True,
+                className="rounded-table"
+            )
+        ])
+        
+    except Exception as e:
+        logger.error(f"Error in date filter: {str(e)}")
+        return html.Div("An error occurred while filtering listings.", className="text-center text-danger my-4")
 
 if __name__ == "__main__":
     app.run(debug=False)

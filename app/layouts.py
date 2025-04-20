@@ -15,7 +15,7 @@ from .graphs import (
 from datetime import datetime
 from .config import Config
 from .utils import logger
-from .data_processor import fetch_listing_details
+from .data_processor import fetch_listing_details, fetch_governorates_delegations  # Add this import
 import pandas as pd
 import json
 
@@ -34,7 +34,13 @@ def create_navigation_header(active_page='/'):
                         dbc.NavItem(dbc.NavLink(
                             "✨ New Listings", href="/new-listings", active=active_page == "/new-listings", className="nav-link")),
                         dbc.NavItem(dbc.NavLink(
-                            "🔍 Price Filter", href="/price-filter", active=active_page == "/price-filter", className="nav-link"))
+                            "🔍 Price Filter", href="/price-filter", active=active_page == "/price-filter", className="nav-link")),
+                        dbc.NavItem(dbc.NavLink(
+                            "📅 Date Filter", 
+                            href="/date-filter",  # Make sure this matches exactly
+                            active=active_page == "/date-filter",
+                            className="nav-link"
+                        ))
                     ], className="ms-auto")
                 ])
             ], align="center")
@@ -341,73 +347,235 @@ def create_price_filter_layout():
     return html.Div([
         create_navigation_header('/price-filter'),
         dbc.Container([
-            # Header Row
+            # Header Row with enhanced styling
             dbc.Row([
-                dbc.Col(
-                    html.H1("🔍 Filter Listings", className="emoji-header mb-0"),
-                    md=10, className="ps-lg-5 pt-3"
-                ),
                 dbc.Col(
                     dbc.Button(
                         "← Dashboard",
                         href="/",
                         color="light",
-                        className="back-btn py-2"
-                    ), md=2, className="pe-lg-5 pt-3 text-end"
-                )
-            ], className="align-items-center mb-4 px-lg-5"),
+                        className="back-btn py-2 shadow-sm"
+                    ), md=2, className="ps-4 pt-3"
+                ),
+                dbc.Col(
+                    html.H1("🔍 Price Filter", className="emoji-header mb-0 text-center"),
+                    md=8, className="pt-3"
+                ),
+                dbc.Col(md=2)
+            ], className="align-items-center mb-4"),
 
-            # Filter Controls
+            # Enhanced Filter Controls
             dbc.Row([
                 dbc.Col([
                     dbc.Card([
+                        dbc.CardHeader(
+                            html.H4("Filter Options", className="text-primary mb-0"),
+                            className="bg-light"
+                        ),
                         dbc.CardBody([
-                            # Price Range Row
+                            # Price Range Row with improved styling
                             dbc.Row([
                                 dbc.Col([
-                                    dbc.Label("💵 Min Price (TND)", className="mb-2"),
+                                    dbc.Label(
+                                        html.Span([
+                                            html.I(className="fas fa-coins me-2"),
+                                            "Minimum Price (TND)"
+                                        ]),
+                                        className="mb-2 text-muted"
+                                    ),
                                     dbc.Input(
                                         id='min-price-input',
                                         type='number',
                                         value=100,
                                         min=0,
-                                        className="form-control"
+                                        className="form-control shadow-sm"
                                     )
                                 ], md=6, className="pe-3"),
                                 dbc.Col([
-                                    dbc.Label("💸 Max Price (TND)", className="mb-2"),
+                                    dbc.Label(
+                                        html.Span([
+                                            html.I(className="fas fa-money-bill-wave me-2"),
+                                            "Maximum Price (TND)"
+                                        ]),
+                                        className="mb-2 text-muted"
+                                    ),
                                     dbc.Input(
                                         id='max-price-input',
                                         type='number',
                                         value=1_000_000,
                                         min=0,
-                                        className="form-control"
+                                        className="form-control shadow-sm"
                                     )
                                 ], md=6, className="ps-3")
                             ], className="mb-4"),
-                            # Property Type
-                            dbc.Label("🏘️ Property Type", className="mb-2"),
+
+                            # Property Type with enhanced styling
+                            html.Hr(className="my-4"),
+                            dbc.Label(
+                                html.Span([
+                                    html.I(className="fas fa-home me-2"),
+                                    "Property Type"
+                                ]),
+                                className="mb-3 text-muted"
+                            ),
                             dbc.RadioItems(
                                 id='product-type-selector',
                                 options=[
-                                    {"label": "🏠 Sale", "value": 1},
-                                    {"label": "🏡 Rent", "value": 0},
-                                    {"label": "🤝 Both", "value": None}
+                                    {"label": html.Span([
+                                        "🏠 Sale ",
+                                        dbc.Badge("For Sale", color="success", className="ms-1")
+                                    ]), "value": 1},
+                                    {"label": html.Span([
+                                        "🏡 Rent ",
+                                        dbc.Badge("For Rent", color="info", className="ms-1")
+                                    ]), "value": 0},
+                                    {"label": html.Span([
+                                        "🤝 Both ",
+                                        dbc.Badge("All Types", color="primary", className="ms-1")
+                                    ]), "value": None}
                                 ],
                                 value=None,
                                 inline=True,
-                                className="filter-radio"
+                                className="filter-radio custom-radio-group"
                             )
-                        ])
-                    ], className="filter-card p-4")
+                        ], className="p-4")
+                    ], className="filter-card shadow-sm", style={"borderRadius": "15px"})
                 ], md=10, className="mx-auto")
             ], className="px-lg-5"),
-            # Results Section
+
+            # Results Section with enhanced styling
             dbc.Row([
                 dbc.Col(
-                    html.Div(id='price-filter-results', className="mt-4 px-lg-5"),
+                    html.Div(
+                        id='price-filter-results',
+                        className="mt-4 px-lg-5"
+                    ),
                     md=12
                 )
             ])
+        ], fluid=True, className="dashboard-container p-4")
+    ])
+
+
+def create_date_filter_layout():
+    """Create layout for date-based filtering with location dropdown."""
+    governorates_data = fetch_governorates_delegations()
+    
+    # Create dropdown options
+    location_options = []
+    for gov in governorates_data:
+        governorate = gov.get('governorate')
+        delegations = gov.get('delegations', [])
+        location_options.extend([
+            {'label': f"{governorate} - {delegation}", 
+             'value': f"{governorate}|{delegation}"} 
+            for delegation in delegations
+        ])
+
+    return html.Div([
+        create_navigation_header('/date-filter'),
+        dbc.Container([
+            # Header Row with enhanced styling
+            dbc.Row([
+                dbc.Col(
+                    dbc.Button(
+                        "← Dashboard",
+                        href="/",
+                        color="light",
+                        className="back-btn py-2 shadow-sm"
+                    ), md=2, className="ps-4 pt-3"
+                ),
+                dbc.Col(
+                    html.H1("📅 Date Filter", className="emoji-header mb-0 text-center"),
+                    md=8, className="pt-3"
+                ),
+                dbc.Col(md=2)
+            ], className="align-items-center mb-4"),
+
+            # Enhanced Filter Controls
+            dbc.Card([
+                dbc.CardHeader(
+                    html.H4("Search Criteria", className="text-primary mb-0"),
+                    className="bg-light"
+                ),
+                dbc.CardBody([
+                    dbc.Row([
+                        # Location Dropdown with enhanced styling
+                        dbc.Col([
+                            dbc.Label(
+                                html.Span([
+                                    html.I(className="fas fa-map-marker-alt me-2"),
+                                    "Location"
+                                ]),
+                                className="mb-2 text-muted"
+                            ),
+                            dcc.Dropdown(
+                                id='location-selector',
+                                options=location_options,
+                                placeholder="Select a location...",
+                                className="mb-4 shadow-sm"
+                            )
+                        ], md=12),
+                        
+                        # Date Range with enhanced styling
+                        dbc.Col([
+                            dbc.Label(
+                                html.Span([
+                                    html.I(className="fas fa-calendar-alt me-2"),
+                                    "Date Range"
+                                ]),
+                                className="mb-2 text-muted"
+                            ),
+                            dcc.DatePickerRange(
+                                id='date-range',
+                                start_date_placeholder_text="Start Date",
+                                end_date_placeholder_text="End Date",
+                                className="mb-4 shadow-sm date-picker-custom"
+                            )
+                        ], md=8),
+                        
+                        # Property Type with enhanced styling
+                        dbc.Col([
+                            dbc.Label(
+                                html.Span([
+                                    html.I(className="fas fa-home me-2"),
+                                    "Property Type"
+                                ]),
+                                className="mb-2 text-muted"
+                            ),
+                            dbc.RadioItems(
+                                id='date-product-type-selector',
+                                options=[
+                                    {"label": html.Span([
+                                        "🏠 Sale ",
+                                        dbc.Badge("For Sale", color="success", className="ms-1")
+                                    ]), "value": 1},
+                                    {"label": html.Span([
+                                        "🏡 Rent ",
+                                        dbc.Badge("For Rent", color="info", className="ms-1")
+                                    ]), "value": 0}
+                                ],
+                                className="mb-4 custom-radio-group"
+                            )
+                        ], md=4)
+                    ]),
+                    
+                    dbc.Button(
+                        html.Span([
+                            html.I(className="fas fa-search me-2"),
+                            "Search Listings"
+                        ]),
+                        id="date-filter-button",
+                        color="primary",
+                        className="w-100 mt-3 shadow-sm"
+                    )
+                ], className="p-4")
+            ], className="filter-card shadow-sm mb-4", style={"borderRadius": "15px"}),
+
+            # Results Section with enhanced styling
+            html.Div(
+                id="date-filter-results",
+                className="mt-4 results-container"
+            )
         ], fluid=True, className="dashboard-container p-4")
     ])
