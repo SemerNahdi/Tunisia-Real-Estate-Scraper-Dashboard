@@ -258,3 +258,4 @@ def process_monthly_distribution_by_type(annonces):
     pivot = df.pivot_table(index='year_month', columns='type_label', aggfunc='size', fill_value=0).reset_index()
     logger.debug(f"Monthly distribution DataFrame:\n{pivot}")
     return pivot
+

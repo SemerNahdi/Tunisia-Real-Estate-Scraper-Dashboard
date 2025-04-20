@@ -284,69 +284,66 @@ def create_new_listings_layout(new_listings_data):
                 dbc.CardHeader(
                     html.H5(
                         html.Span([
-                            html.I(className="fas fa-tag me-2"),
-                            f"Listing ID: {annonce.get('id', 'N/A')}"
+                            "📍 ",
+                            f"{annonce.get('location', {}).get('governorate', 'N/A')}, "
+                            f"{annonce.get('location', {}).get('delegation', 'N/A')}"
                         ]),
-                        className="text-primary mb-0"
+                        className="mb-0 text-primary"
                     ),
                     className="bg-light"
                 ),
                 dbc.CardBody([
-                    html.H5(
-                        html.Span([
-                            html.I(className="fas fa-home me-2"),
-                            annonce.get('title', 'N/A')
-                        ]),
-                        className="card-title text-primary"
-                    ),
-                    html.P(
-                        html.Span([
-                            html.I(className="fas fa-coins me-2"),
-                            f"Price: {annonce.get('price', 'N/A')} TND"
-                        ]),
-                        className="card-text price-highlight lead"
-                    ),
-                    html.P(
-                        html.Span([
-                            html.I(className="fas fa-map-marker-alt me-2"),
-                            f"Location: {annonce.get('location', {}).get('governorate', 'N/A')}, "
-                            f"{annonce.get('location', {}).get('delegation', 'N/A')}"
-                        ]),
-                        className="card-text"
-                    ),
-                    html.P(
-                        html.Span([
-                            html.I(className="fas fa-file-alt me-2"),
-                            f"Description: {annonce.get('description', 'N/A')[:100]}..."
-                        ]),
-                        className="card-text"
-                    ),
-                    html.P(
-                        html.Span([
-                            html.I(className="fas fa-calendar me-2"),
-                            f"Published On: {annonce.get('metadata', {}).get('publishedOn', 'N/A')}"
-                        ]),
-                        className="card-text text-muted"
-                    ),
-                    html.Hr(className="my-3"),
-                    dbc.Button(
-                        html.Span([
-                            html.I(className="fas fa-eye me-2"),
-                            "View Details"
-                        ]),
-                        href=f"/listings/{annonce.get('id', 'N/A')}",
-                        color="primary",
-                        className="w-100 mt-2 shadow-sm"
-                    )
-                ], className="p-4")
-            ], className="listing-card shadow-sm mb-4", style={"borderRadius": "15px"})
-        ], md=6) for annonce in new_annonces
+                    html.Div([
+                        html.H5(
+                            annonce.get('title', 'N/A'),
+                            className="card-title text-dark mb-3",
+                            style={"minHeight": "48px"}
+                        ),
+                        html.Div([
+                            html.P(
+                                html.Span([
+                                    "💰 ",
+                                    f"{annonce.get('price', 'N/A')} TND"
+                                ]),
+                                className="card-text price-highlight mb-3 fs-5"
+                            ),
+                            html.P(
+                                html.Span([
+                                    "📝 ",
+                                    f"{annonce.get('description', 'N/A')[:150]}..."
+                                ]),
+                                className="card-text text-muted mb-3",
+                                style={"minHeight": "80px"}
+                            ),
+                            html.P(
+                                html.Span([
+                                    "📅 ",
+                                    f"Published: {annonce.get('metadata', {}).get('publishedOn', 'N/A')}"
+                                ]),
+                                className="card-text text-muted mb-3"
+                            ),
+                            html.Div([
+                                dbc.Button(
+                                    html.Span([
+                                        "View Details ",
+                                        html.I(className="fas fa-arrow-right ms-1")
+                                    ]),
+                                    href=f"/listings/{annonce.get('id', 'N/A')}",
+                                    color="primary",
+                                    className="w-100 shadow-sm"
+                                )
+                            ], className="mt-auto")
+                        ])
+                    ], className="d-flex flex-column h-100")
+                ], className="d-flex flex-column", style={"height": "350px"})
+            ], className="listing-card shadow-sm h-100", style={"borderRadius": "15px"})
+        ], md=6, className="mb-4") for annonce in new_annonces
     ]
 
     return html.Div([
         create_navigation_header('/new-listings'),
         dbc.Container([
-            # Header Row with enhanced styling
+            # Header Row
             dbc.Row([
                 dbc.Col(
                     dbc.Button(
@@ -360,42 +357,12 @@ def create_new_listings_layout(new_listings_data):
                     html.H1("✨ New Listings", className="emoji-header mb-0 text-center"),
                     md=8, className="pt-3"
                 ),
-                dbc.Col(md=2)
+                dbc.Col(md=2)  # Empty column for spacing
             ], className="align-items-center mb-4"),
-
-            # Stats Card
-            dbc.Row([
-                dbc.Col([
-                    dbc.Card([
-                        dbc.CardHeader(
-                            html.H4(
-                                html.Span([
-                                    html.I(className="fas fa-chart-bar me-2"),
-                                    "📌 Listings Overview"
-                                ]),
-                                className="text-primary mb-0"
-                            ),
-                            className="bg-light"
-                        ),
-                        dbc.CardBody([
-                            html.H2(
-                                f"{new_count} New Listings Today",
-                                className="text-center mb-0 text-primary"
-                            )
-                        ], className="p-4")
-                    ], className="stats-card shadow-sm mb-4", style={"borderRadius": "15px"})
-                ], md=12)
-            ], className="px-lg-5"),
-
-            # Listings Grid
-            dbc.Row(
-                listings_cards,
-                className="g-4 px-lg-5"
-            )
+            html.H4(f"📌 Total New Listings: {new_count}", className="text-center my-2"),
+            dbc.Row(listings_cards, className="g-4 px-4")
         ], fluid=True, className="dashboard-container p-4")
     ])
-
-
 
 # --------------------------- Listing Details Layout ---------------------------
 def create_listing_details_layout(listing_id):
