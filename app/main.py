@@ -43,13 +43,8 @@ new_listings_data = clean_data(raw_new_listings_data)
 
 # After processing the data
 all_listings_data = fetch_all_listings()
-logger.debug(f"Fetched {len(all_listings_data)} listings")
-
 avg_prices_df = process_average_prices_over_time(all_listings_data)
-logger.debug(f"Processed average prices, dataframe shape: {avg_prices_df.shape}")
-
 distribution_df = process_monthly_distribution_by_type(all_listings_data)
-logger.debug(f"Processed distribution, dataframe shape: {distribution_df.shape}")
 
 # Define layout
 app.layout = dcc.Location(id='url', refresh=False), html.Div(id='page-content')

@@ -4,8 +4,6 @@ import pandas as pd
 from .utils import logger  # Add this import at the top
 
 def create_pie_chart(data, title):
-    """Generate a bar chart for governorate distribution."""
-    # Sort data by values in descending order and take top 10
     sorted_data = dict(sorted(data.items(), key=lambda x: x[1], reverse=True)[:10])
     fig = px.bar(
         x=list(sorted_data.keys()),
@@ -13,7 +11,7 @@ def create_pie_chart(data, title):
         title=title,
         labels={'x': 'Governorate', 'y': 'Number of Listings'}
     )
-    # Update bar style
+    
     fig.update_traces(
         marker_color='black',
         marker_line_width=0,
@@ -23,6 +21,7 @@ def create_pie_chart(data, title):
             line=dict(width=0)
         )
     )
+    
     fig.update_layout(
         paper_bgcolor='white',
         plot_bgcolor='white',
