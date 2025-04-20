@@ -1,14 +1,24 @@
 from dash import Dash, dcc, html, Input, Output, callback, State
 import dash_bootstrap_components as dbc
 from .config import Config
-from .data_processor import load_statistics, load_new_listings, fetch_filtered_listings, clean_data, fetch_listings_by_date
+from .data_processor import (
+    load_statistics, 
+    load_new_listings, 
+    fetch_filtered_listings, 
+    clean_data, 
+    fetch_listings_by_date,
+    fetch_all_listings,
+    process_average_prices_over_time,
+    process_monthly_distribution_by_type
+)
 from .layouts import (
     create_layout, 
     create_navigation_header, 
     create_new_listings_layout, 
     create_price_filter_layout,
     create_listing_details_layout,
-    create_date_filter_layout
+    create_date_filter_layout,
+    create_all_listings_layout
 )
 from datetime import datetime
 from .utils import logger
@@ -23,12 +33,23 @@ app = Dash(__name__, external_stylesheets=[
 # Load and process data
 url_statistics = f"{Config.FASTAPI_URL}/statistics"
 url_new_listings = f"{Config.FASTAPI_URL}/annonces/new"
+url_all_listings = f"{Config.FASTAPI_URL}/annonces"
 
 raw_statistics_data = load_statistics(url_statistics)
 statistics_data = clean_data(raw_statistics_data)
 
 raw_new_listings_data = load_new_listings(url_new_listings)
 new_listings_data = clean_data(raw_new_listings_data)
+
+# After processing the data
+all_listings_data = fetch_all_listings()
+logger.debug(f"Fetched {len(all_listings_data)} listings")
+
+avg_prices_df = process_average_prices_over_time(all_listings_data)
+logger.debug(f"Processed average prices, dataframe shape: {avg_prices_df.shape}")
+
+distribution_df = process_monthly_distribution_by_type(all_listings_data)
+logger.debug(f"Processed distribution, dataframe shape: {distribution_df.shape}")
 
 # Define layout
 app.layout = dcc.Location(id='url', refresh=False), html.Div(id='page-content')
@@ -46,8 +67,10 @@ def display_page(pathname):
     elif pathname.startswith('/listings/'):
         listing_id = pathname.split('/')[-1]
         return create_listing_details_layout(listing_id)
-    elif pathname == '/date-filter':  
+    elif pathname == '/date-filter':
         return create_date_filter_layout()
+    elif pathname == '/all-listings':
+        return create_all_listings_layout(avg_prices_df, distribution_df)
     else:
         return html.Div("404: Page Not Found")
 
@@ -58,7 +81,6 @@ def display_page(pathname):
      Input('max-price-input', 'value'),
      Input('product-type-selector', 'value')]
 )
-
 def update_filtered_listings(min_price, max_price, producttype):
     data = fetch_filtered_listings(min_price, max_price, producttype)
     annonces = data.get('annonces', [])
@@ -70,7 +92,6 @@ def update_filtered_listings(min_price, max_price, producttype):
             html.P("No listings found.", className="text-center my-2")
         ])
     
-    # Table header with all columns including ID
     table_header = [
         html.Thead(
             html.Tr([
@@ -84,32 +105,25 @@ def update_filtered_listings(min_price, max_price, producttype):
         )
     ]
     
-    # Table body with alternating row colors
     table_rows = []
     for i, annonce in enumerate(annonces):
         listing_id = annonce.get('id', 'N/A')
-        # Format the publication date
         published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
         if published_on != 'N/A':
             try:
-                # Parse the ISO 8601 date string and format it to a readable format
                 published_on = datetime.fromisoformat(published_on.replace("Z", "+00:00")).strftime('%B %d, %Y, %I:%M %p')
             except ValueError:
                 published_on = 'Invalid Date'
         
-        # Get location details
         location = annonce.get('location', {})
         location_str = f"{location.get('governorate', 'N/A')}, {location.get('delegation', 'N/A')}"
         
-        # Get description and truncate if necessary
         description = annonce.get('description', 'N/A')
         if description != 'N/A':
             description = f"{description[:100]}..." if len(description) > 100 else description
         
-        # Alternate row classes
         row_class = "table-soft-light" if i % 2 == 0 else "table-soft-dark"
         
-        # Create table row with separate columns and a button
         table_rows.append(
             html.Tr(
                 className=f"{row_class}",
@@ -160,18 +174,14 @@ def update_filtered_listings(min_price, max_price, producttype):
      State('date-product-type-selector', 'value')],
     prevent_initial_call=True
 )
-
 def update_date_filtered_listings(n_clicks, start_date, end_date, location, producttype):
-    print(f"Callback triggered with dates: {start_date} to {end_date}")  # Debug print
+    logger.debug(f"Callback triggered with dates: {start_date} to {end_date}")
     if not n_clicks or not start_date or not end_date:
         return html.Div("Select dates and click search to view listings.", className="text-center my-4")
     
     try:
-        # Convert string dates to datetime objects
         start_date = datetime.strptime(start_date.split('T')[0], '%Y-%m-%d')
         end_date = datetime.strptime(end_date.split('T')[0], '%Y-%m-%d')
-        
-        # Fetch filtered data
         data = fetch_listings_by_date(start_date, end_date, producttype)
         annonces = data.get('annonces', [])
         total = data.get('total', 0)
@@ -182,7 +192,6 @@ def update_date_filtered_listings(n_clicks, start_date, end_date, location, prod
                 html.P("No listings found for the selected criteria.", className="text-center my-2")
             ])
         
-        # Filter by location if selected
         if location:
             governorate, delegation = location.split('|')
             annonces = [
@@ -191,7 +200,6 @@ def update_date_filtered_listings(n_clicks, start_date, end_date, location, prod
                 and a.get('location', {}).get('delegation') == delegation
             ]
         
-        # Create table header
         table_header = [
             html.Thead(
                 html.Tr([
@@ -204,13 +212,12 @@ def update_date_filtered_listings(n_clicks, start_date, end_date, location, prod
             )
         ]
         
-        # Create table rows
         table_rows = []
         for i, annonce in enumerate(annonces):
             listing_id = annonce.get('id', 'N/A')
             published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
             if published_on != 'N/A':
-                published_on = datetime.fromisoformat(published_on.replace('Z', '+00:00')).strftime('%B %d, %Y')
+                published_on = datetime.fromisoformat(published_on.replace("Z", "+00:00")).strftime('%B %d, %Y')
             
             location_str = f"{annonce.get('location', {}).get('governorate', 'N/A')}, {annonce.get('location', {}).get('delegation', 'N/A')}"
             

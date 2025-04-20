@@ -10,7 +10,9 @@ from .graphs import (
     create_pie_chart,
     create_delegation_chart,
     create_publisher_chart,
-    create_type_chart
+    create_type_chart,
+    create_avg_price_line_chart,  # Add this import
+    create_stacked_bar_chart      # Add this import
 )
 from datetime import datetime
 from .config import Config
@@ -36,11 +38,9 @@ def create_navigation_header(active_page='/'):
                         dbc.NavItem(dbc.NavLink(
                             "🔍 Price Filter", href="/price-filter", active=active_page == "/price-filter", className="nav-link")),
                         dbc.NavItem(dbc.NavLink(
-                            "📅 Date Filter", 
-                            href="/date-filter",  # Make sure this matches exactly
-                            active=active_page == "/date-filter",
-                            className="nav-link"
-                        ))
+                            "📅 Date Filter", href="/date-filter", active=active_page == "/date-filter", className="nav-link")),
+                        dbc.NavItem(dbc.NavLink(
+                            "📈 All Listings", href="/all-listings", active=active_page == "/all-listings", className="nav-link"))
                     ], className="ms-auto")
                 ])
             ], align="center")
@@ -57,7 +57,6 @@ def create_layout(statistics_data, new_listings_data):
         logger.error("Invalid data format for dashboard layout")
         return html.Div("Error: Data is not in the expected format.")
 
-    # Extract statistics
     total_listings = statistics_data.get('total_listings', 0)
     governorate_stats = {item['_id']: item['count'] for item in statistics_data.get('governorate_stats', [])}
     type_stats = {item['_id']: item['count'] for item in statistics_data.get('type_stats', [])}
@@ -66,7 +65,6 @@ def create_layout(statistics_data, new_listings_data):
     publisher_stats = {item['_id']: item['count'] for item in statistics_data.get('publisher_stats', [])}
     delegation_data = statistics_data.get('delegation_by_governorate', [])
 
-    # Calculate shop percentage
     total_shops = sum(count for is_shop, count in publisher_stats.items() if is_shop)
     total_individuals = sum(count for is_shop, count in publisher_stats.items() if not is_shop)
     shop_percentage = round((total_shops / total_listings) * 100, 1) if total_listings > 0 else 0
@@ -74,88 +72,117 @@ def create_layout(statistics_data, new_listings_data):
     return html.Div([
         create_navigation_header('/'),
         dbc.Container([
-        html.H1("🏠 Tunisian Real Estate Dashboard", className="emoji-header text-center my-4 p-3"),
-
-        # Key Metrics Cards
-        dbc.Row([
-            dbc.Col(
-                dbc.Card([
-                    dbc.CardBody([
-                        html.H4("📊 Total Listings", className="card-title mb-2"),
-                        html.H2(f"{total_listings:,}", className="metric-value text-pastel-blue")
-                    ])
-                ], className="metric-card pastel-border-blue hover-scale", color="light"),
-                md=3, className="mb-4"
-            ),
-            dbc.Col(
-                dbc.Card([
-                    dbc.CardBody([
-                        html.H4("💰 Avg Sale Price", className="card-title mb-2"),
-                        html.H2(f"{avg_price_sale:,.2f} TND", className="metric-value text-pastel-mint")
-                    ])
-                ], className="metric-card pastel-border-mint hover-scale", color="light"),
-                md=3, className="mb-4"
-            ),
-            dbc.Col(
-                dbc.Card([
-                    dbc.CardBody([
-                        html.H4("🏘️ Avg Rent Price", className="card-title mb-2"),
-                        html.H2(f"{avg_price_rent:,.2f} TND", className="metric-value text-pastel-peach")
-                    ])
-                ], className="metric-card pastel-border-peach hover-scale", color="light"),
-                md=3, className="mb-4"
-            ),
-            dbc.Col(
-                dbc.Card([
-                    dbc.CardBody([
-                        html.H4("🏪 Shop Listings", className="card-title mb-2"),
-                        html.H2(f"{shop_percentage}%", className="metric-value text-pastel-pink")
-                    ])
-                ], className="metric-card pastel-border-pink hover-scale", color="light"),
-                md=3, className="mb-4"
-            )
-        ], className="mb-5 g-3"),
-
-        # Charts Grid
-        dbc.Row([
-            # Left Column
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardHeader("📍 Listings by Governorate", className="chart-header"),
-                    dbc.CardBody([
-                        dcc.Graph(
-                            id='governorate-pie',
-                            figure=create_pie_chart(governorate_stats, "Listings by Governorate")
-                        )
-                    ])
-                ], className="chart-card mb-4"),
-                dbc.Card([
-                    dbc.CardHeader("🏢 Publisher Types", className="chart-header"),
-                    dbc.CardBody([
-                        dcc.Graph(id='publisher-chart', figure=create_publisher_chart(publisher_stats))
-                    ])
-                ], className="chart-card")
-            ], md=6),
-
-            # Right Column
-            dbc.Col([
-                dbc.Card([
-                    dbc.CardHeader("🏛️ Property Types", className="chart-header"),
-                    dbc.CardBody([
-                        dcc.Graph(id='type-chart', figure=create_type_chart(type_stats))
-                    ])
-                ], className="chart-card mb-4"),
-                dbc.Card([
-                    dbc.CardHeader("🗺️ Top Delegations", className="chart-header"),
-                    dbc.CardBody([
-                        dcc.Graph(id='delegation-chart', figure=create_delegation_chart(delegation_data))
-                    ])
-                ], className="chart-card")
-            ], md=6)
-        ], className="g-4")
-    ], fluid=True, className="dashboard-container p-4")
+            html.H1("🏠 Tunisian Real Estate Dashboard", className="emoji-header text-center my-4 p-3"),
+            dbc.Row([
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardBody([
+                            html.H4("📊 Total Listings", className="card-title mb-2"),
+                            html.H2(f"{total_listings:,}", className="metric-value text-pastel-blue")
+                        ])
+                    ], className="metric-card pastel-border-blue hover-scale", color="light"),
+                    md=3, className="mb-4"
+                ),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardBody([
+                            html.H4("💰 Avg Sale Price", className="card-title mb-2"),
+                            html.H2(f"{avg_price_sale:,.2f} TND", className="metric-value text-pastel-mint")
+                        ])
+                    ], className="metric-card pastel-border-mint hover-scale", color="light"),
+                    md=3, className="mb-4"
+                ),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardBody([
+                            html.H4("🏘️ Avg Rent Price", className="card-title mb-2"),
+                            html.H2(f"{avg_price_rent:,.2f} TND", className="metric-value text-pastel-peach")
+                        ])
+                    ], className="metric-card pastel-border-peach hover-scale", color="light"),
+                    md=3, className="mb-4"
+                ),
+                dbc.Col(
+                    dbc.Card([
+                        dbc.CardBody([
+                            html.H4("🏪 Shop Listings", className="card-title mb-2"),
+                            html.H2(f"{shop_percentage}%", className="metric-value text-pastel-pink")
+                        ])
+                    ], className="metric-card pastel-border-pink hover-scale", color="light"),
+                    md=3, className="mb-4"
+                )
+            ], className="mb-5 g-3"),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader("📍 Listings by Governorate", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='governorate-pie',
+                                figure=create_pie_chart(governorate_stats, "Listings by Governorate")
+                            )
+                        ])
+                    ], className="chart-card mb-4"),
+                    dbc.Card([
+                        dbc.CardHeader("🏢 Publisher Types", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(id='publisher-chart', figure=create_publisher_chart(publisher_stats))
+                        ])
+                    ], className="chart-card")
+                ], md=6),
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader("🏛️ Property Types", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(id='type-chart', figure=create_type_chart(type_stats))
+                        ])
+                    ], className="chart-card mb-4"),
+                    dbc.Card([
+                        dbc.CardHeader("🗺️ Top Delegations", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(id='delegation-chart', figure=create_delegation_chart(delegation_data))
+                        ])
+                    ], className="chart-card")
+                ], md=6)
+            ], className="g-4")
+        ], fluid=True, className="dashboard-container p-4")
     ])
 
+def create_all_listings_layout(avg_prices_df, distribution_df):
+    """Create the layout for the all listings page with average price and distribution charts."""
+    if avg_prices_df.empty and distribution_df.empty:
+        logger.error("No data available for all listings charts")
+        return html.Div("Error: No listing data available.", className="text-center text-danger my-4")
+
+    return html.Div([
+        create_navigation_header('/all-listings'),
+        dbc.Container([
+            html.H1("📈 All Listings Analytics", className="emoji-header text-center my-4 p-3"),
+            dbc.Row([
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader("💰 Average Prices Over Time", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='avg-price-line-chart',
+                                figure=create_avg_price_line_chart(avg_prices_df)
+                            )
+                        ])
+                    ], className="chart-card mb-4")
+                ], md=6),
+                dbc.Col([
+                    dbc.Card([
+                        dbc.CardHeader("🏛️ Monthly Distribution by Property Type", className="chart-header"),
+                        dbc.CardBody([
+                            dcc.Graph(
+                                id='stacked-bar-chart',
+                                figure=create_stacked_bar_chart(distribution_df)
+                            )
+                        ])
+                    ], className="chart-card mb-4")
+                ], md=6)
+            ], className="g-4")
+        ], fluid=True, className="dashboard-container p-4")
+    ])
 
 # --------------------------- New Listings Layout ---------------------------
 def create_new_listings_layout(new_listings_data):
@@ -589,5 +616,4 @@ def create_date_filter_layout():
                 id="date-filter-results",
                 className="mt-4 results-container"
             )
-        ], fluid=True, className="dashboard-container p-4")
-    ])
+        ], fluid=True, className="dashboard-container p-4") ])

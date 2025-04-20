@@ -1,6 +1,7 @@
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+from .utils import logger  # Add this import at the top
 
 def create_pie_chart(data, title):
     """Generate a bar chart for governorate distribution."""
@@ -198,5 +199,146 @@ def create_publisher_chart(publisher_stats):
             xanchor="right",
             x=1
         )
+    )
+    return fig
+
+def create_avg_price_line_chart(df):
+    """Generate a line chart showing average prices over time, split by Rent and Sale."""
+    if df.empty:
+        logger.warning("No data for average price line chart")
+        return go.Figure()
+    
+    fig = px.line(
+        df,
+        x='year_month',
+        y='price',
+        color='type_label',
+        title='Average Listing Prices Over Time',
+        labels={'year_month': 'Month', 'price': 'Average Price (TND)', 'type_label': 'Property Type'},
+        markers=True,
+        color_discrete_map={'Sale': 'black', 'Rent': '#666666'}  # Changed to match UI theme
+    )
+    
+    # Update line and marker style for a softer look
+    fig.update_traces(
+        line=dict(
+            shape='spline',  # Makes the lines curved
+            smoothing=0.8,   # Adjust smoothing factor
+            width=3         # Thicker lines
+        ),
+        marker=dict(
+            size=10,
+            symbol='circle',
+            line=dict(
+                width=2,
+                color='white'
+            )
+        )
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+        title_font_color='black',
+        font_color='black',
+        xaxis_title_font_color='black',
+        yaxis_title_font_color='black',
+        height=400,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.2,
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            type='category',
+            tickangle=45,
+            tickmode='auto',
+            nticks=12,
+            tickfont=dict(size=10),
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='rgba(0,0,0,0.1)'
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='rgba(0,0,0,0.1)',
+            tickformat=',d',  # Format numbers with commas
+            title_text='Average Price (TND)',
+            rangemode='tozero'  # Start y-axis from 0
+        ),
+        hovermode='x unified',
+        margin=dict(l=50, r=50, t=50, b=100)
+    )
+    return fig
+
+def create_stacked_bar_chart(df):
+    """Generate a grouped bar chart showing monthly distribution by property type."""
+    if df.empty:
+        logger.warning("No data for grouped bar chart")
+        return go.Figure()
+    
+    types = [col for col in df.columns if col != 'year_month']
+    if not types:
+        logger.warning("No property types found for grouped bar chart")
+        return go.Figure()
+    
+    fig = px.bar(
+        df,
+        x='year_month',
+        y=types,
+        title='Monthly Distribution of Listings by Property Type',
+        labels={'year_month': 'Month', 'value': 'Number of Listings'},
+        barmode='group',  # Changed from 'stack' to 'group'
+        color_discrete_map={'Sale': 'black', 'Rent': '#666666'}  # Changed to match UI theme
+    )
+    
+    # Update bar style
+    fig.update_traces(
+        marker=dict(
+            cornerradius=8,
+            line=dict(width=1, color='white'),
+            opacity=0.9
+        ),
+        width=0.35  # Adjust bar width
+    )
+    
+    fig.update_layout(
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+        title_font_color='black',
+        font_color='black',
+        xaxis_title_font_color='black',
+        yaxis_title_font_color='black',
+        bargap=0.15,  # Adjust gap between bar groups
+        height=400,
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.2,
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            type='category',
+            tickangle=45,
+            tickmode='auto',
+            nticks=12,
+            tickfont=dict(size=10),
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='rgba(0,0,0,0.1)'
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridwidth=0.5,
+            gridcolor='rgba(0,0,0,0.1)'
+        ),
+        hovermode='x unified',
+        margin=dict(l=50, r=50, t=50, b=100)
     )
     return fig
