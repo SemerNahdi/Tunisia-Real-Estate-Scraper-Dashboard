@@ -74,7 +74,74 @@ def display_page(pathname):
     else:
         return html.Div("404: Page Not Found")
 
-# Callback to fetch and display filtered listings
+def create_listings_table(annonces, include_description=True):
+    table_header = [
+        html.Thead(
+            html.Tr([
+                html.Th("Title"),
+                html.Th("Price"),
+                html.Th("Location"),
+                *(([html.Th("Description")] if include_description else []) +
+                  [html.Th("Published On"),
+                   html.Th("Actions")])
+            ])
+        )
+    ]
+    
+    table_rows = []
+    for i, annonce in enumerate(annonces):
+        listing_id = annonce.get('id', 'N/A')
+        published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
+        if published_on != 'N/A':
+            try:
+                date_format = '%B %d, %Y, %I:%M %p' if include_description else '%B %d, %Y'
+                published_on = datetime.fromisoformat(published_on.replace("Z", "+00:00")).strftime(date_format)
+            except ValueError:
+                published_on = 'Invalid Date'
+        
+        location = annonce.get('location', {})
+        location_str = f"{location.get('governorate', 'N/A')}, {location.get('delegation', 'N/A')}"
+        
+        row_data = [
+            html.Td(annonce.get('title', 'N/A')),
+            html.Td(f"{annonce.get('price', 'N/A')} TND"),
+            html.Td(location_str)
+        ]
+        
+        if include_description:
+            description = annonce.get('description', 'N/A')
+            if description != 'N/A':
+                description = f"{description[:100]}..." if len(description) > 100 else description
+            row_data.append(html.Td(description))
+        
+        row_data.extend([
+            html.Td(published_on),
+            html.Td(
+                dbc.Button(
+                    "View Details",
+                    href=f"/listings/{listing_id}",
+                    color="primary",
+                    size="sm",
+                    className="view-details-btn",
+                    **({"id": f"view-details-{listing_id}", "external_link": True, "n_clicks": 0} if include_description else {})
+                ),
+                className="text-center"
+            )
+        ])
+        
+        row_class = "table-soft-light" if i % 2 == 0 else "table-soft-dark"
+        table_rows.append(html.Tr(className=row_class, children=row_data))
+    
+    return dbc.Table(
+        children=[*table_header, html.Tbody(children=table_rows)],
+        bordered=True,
+        hover=True,
+        responsive=True,
+        striped=True,
+        className="rounded-table"
+    )
+
+# Then modify the callbacks to use this function:
 @callback(
     Output('price-filter-results', 'children'),
     [Input('min-price-input', 'value'),
@@ -92,77 +159,9 @@ def update_filtered_listings(min_price, max_price, producttype):
             html.P("No listings found.", className="text-center my-2")
         ])
     
-    table_header = [
-        html.Thead(
-            html.Tr([
-                html.Th("Title"),
-                html.Th("Price"),
-                html.Th("Location"),
-                html.Th("Description"),
-                html.Th("Published On"),
-                html.Th("Actions")
-            ])
-        )
-    ]
-    
-    table_rows = []
-    for i, annonce in enumerate(annonces):
-        listing_id = annonce.get('id', 'N/A')
-        published_on = annonce.get('metadata', {}).get('publishedOn', 'N/A')
-        if published_on != 'N/A':
-            try:
-                published_on = datetime.fromisoformat(published_on.replace("Z", "+00:00")).strftime('%B %d, %Y, %I:%M %p')
-            except ValueError:
-                published_on = 'Invalid Date'
-        
-        location = annonce.get('location', {})
-        location_str = f"{location.get('governorate', 'N/A')}, {location.get('delegation', 'N/A')}"
-        
-        description = annonce.get('description', 'N/A')
-        if description != 'N/A':
-            description = f"{description[:100]}..." if len(description) > 100 else description
-        
-        row_class = "table-soft-light" if i % 2 == 0 else "table-soft-dark"
-        
-        table_rows.append(
-            html.Tr(
-                className=f"{row_class}",
-                children=[
-                    html.Td(annonce.get('title', 'N/A')),
-                    html.Td(f"{annonce.get('price', 'N/A')} TND"),
-                    html.Td(location_str),
-                    html.Td(description),
-                    html.Td(published_on),
-                    html.Td(
-                        dbc.Button(
-                            "View Details",
-                            id=f"view-details-{listing_id}",
-                            href=f"/listings/{listing_id}",
-                            color="primary",
-                            size="sm",
-                            className="view-details-btn",
-                            external_link=True,
-                            n_clicks=0
-                        ),
-                        className="text-center"
-                    )
-                ]
-            )
-        )
-    
     return html.Div([
         html.H4(f"Total Listings: {total}", className="text-center my-2"),
-        dbc.Table(
-            children=[
-                *table_header,
-                html.Tbody(children=table_rows)
-            ],
-            bordered=True,
-            hover=True,
-            responsive=True,
-            striped=True,
-            className="rounded-table"
-        )
+        create_listings_table(annonces, include_description=True)
     ])
 
 @callback(
@@ -247,14 +246,7 @@ def update_date_filtered_listings(n_clicks, start_date, end_date, location, prod
         
         return html.Div([
             html.H4(f"Total Listings: {len(annonces)}", className="text-center my-2"),
-            dbc.Table(
-                children=[*table_header, html.Tbody(children=table_rows)],
-                bordered=True,
-                hover=True,
-                responsive=True,
-                striped=True,
-                className="rounded-table"
-            )
+            create_listings_table(annonces, include_description=False)
         ])
         
     except Exception as e:
