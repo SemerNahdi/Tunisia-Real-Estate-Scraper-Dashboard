@@ -55,47 +55,36 @@ A modern and interactive dashboard for visualizing and analyzing real estate dat
 
 1. Clone the repository:
 
-```bash
-
-git clone [REPO_URL]
-
-cd Tunisia-Real-Estate-Scraper-Dashboard
-
-```
+        ```bash
+        git clone  https://github.comSemerNahdiTunisia-Real-Estate-Scraper-Dashboard.git
+        cd Tunisia-Real-Estate-Scraper-Dashboard
+        ```
 
 2. Create a virtual environment:
 
-```bash
-
-python -m venv .venv
-
-```
+        ```bash
+        python -m venv .venv
+        ```
 
 3. Activate the virtual environment:
 
-- Windows:
+        - Windows:
 
-```bash
+        ```bash
+        .venv\Scripts\activate
+        ```
 
-.venv\Scripts\activate
+        - macOS/Linux:
 
-```
-
-- macOS/Linux:
-
-```bash
-
-source .venv/bin/activate
-
-```
+        ```bash
+        source .venv/bin/activate
+        ```
 
 4. Install dependencies:
 
-```bash
-
-pip install -r requirements.txt
-
-```
+        ```bash
+        pip install -r requirements.txt
+        ```
 
 **## 🚀 Running the Application**
 
@@ -106,44 +95,36 @@ pip install -r requirements.txt
 3. Run the application:
 
 ```bash
-
 cd app
-
 python -m app.main
-
 ```
 
 4. Access the dashboard in your browser:
 
 ```
-
 http://localhost:8050
 
 ```
 
 **## 📁 Project Structure**
 
-```
+📂 Tunisia-Real-Estate-Scraper-Dashboard
+    📂 app
+        📂 assets
+          📄 styles.css
+        📄 config.py               # Application configuration
+        📄 main.py                 # Application entry point
+        📄 data_processor.py       # Data processing and analysis 
+        📄 graphs.py               
+        📄 layouts.py              # Dashboard layout components
+        📄 utils.py
+   📂 assests
+        📄 styles.css              # Custom CSS styles
+📄 requirements.txt                # Project dependencies
+📄 README.md
 
-Tunisia-Real-Estate-Scraper-Dashboard/
 
-├── app/
 
-│   ├── main.py              # Application entry point
-
-│   ├── config.py            # Application configuration
-
-│   ├── data_processor.py    # Data processing and analysis
-
-│   └── layouts.py           # Dashboard layout components
-
-├── assets/
-
-│   └── styles.css           # Custom CSS styles
-
-└── requirements.txt         # Project dependencies
-
-```
 
 **## 🔗 Available Pages**
 
