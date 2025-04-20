@@ -1,144 +1,137 @@
-**# 🏠 Tunisia Real Estate Dashboard**
+# 🏠 Tunisia Real Estate Dashboard
+
+<div align="center">
 
 [![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)](https://www.python.org/downloads/)
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 [![Status](https://img.shields.io/badge/status-active-success.svg)]()
 
 A modern and interactive dashboard for visualizing and analyzing real estate data in Tunisia, built with Dash and Plotly.
 
-**## ✨ Features**
+[Features](#-features) •
+[Technologies](#%EF%B8%8F-technologies) •
+[Installation](#-installation) •
+[Usage](#-usage) •
+[Structure](#-project-structure) •
+[License](#-license)
 
-**### 1. Data Visualization**
+</div>
 
+## ✨ Features
+
+### Data Analytics
 - 📊 Interactive real estate statistics and metrics
 - 📈 Distribution charts for listings by governorate
 - 💰 Price distribution analysis
-- 🏢 Sale vs. Rent distribution visualization
-- 👥 Publisher type analysis (Shop vs. Individual)
+- 🏢 Property type analysis (Sale vs. Rent)
+- 👥 Publisher insights (Shop vs. Individual)
 
-**### 2. Listings Management**
+### Listing Management
+- 🆕 Real-time new listings display
+- 🔍 Advanced filtering system
+- 📅 Date-based filtering
+- 💰 Price-based filtering
 
-- 🆕 New listings display with detailed information
-- 🔍 Advanced filtering capabilities
-- 📱 Responsive design for all devices
+### User Experience
+- 💻 Modern, intuitive interface
+- 🎨 Responsive Bootstrap design
+- 📱 Mobile-friendly layout
+- 🔄 Real-time data updates
 
-**### 3. User Interface**
+## 🛠️ Technologies
 
-- 💻 Modern and intuitive dashboard layout
-- 🎨 Custom styling with Bootstrap components
-- 📱 Mobile-responsive design
-- 🔄 Interactive data filtering
+### Core
+- **Python** - Primary programming language
+- **Dash** - Web application framework
+- **Plotly** - Data visualization library
+- **Pandas** - Data manipulation
 
-**## 🛠️ Technologies Used**
+### Frontend
+- **Dash Bootstrap Components** - UI framework
+- **CSS** - Custom styling
+- **FontAwesome** - Icons
 
-- ***Python****: Core programming language
-- ***Dash****: Web framework for building interactive dashboards
-- ***Plotly****: Interactive data visualization library
-- ***Dash Bootstrap Components****: UI components for modern design
-- ***Pandas****: Data manipulation and analysis
-- ***FastAPI****: Backend API for data retrieval
-- ***MongoDB****: Database for storing real estate data
+### Backend
+- **FastAPI** - REST API service
+- **MongoDB** - Database system
 
-**## 📦 Installation**
+## 📦 Installation
 
-**### Prerequisites**
+### Prerequisites
+- Python 3.7 or higher
+- pip (Python package manager)
+- MongoDB instance
 
-1. ****Python 3.7+****: Ensure Python is installed on your system
+### Setup Steps
 
-2. ****pip****: Python package manager
+1. **Clone Repository**
+```bash
+git clone https://github.com/SemerNahdi/Tunisia-Real-Estate-Scraper-Dashboard.git
+cd Tunisia-Real-Estate-Scraper-Dashboard
+```
 
-3. ****MongoDB****: Running instance for data storage
+2. Create Virtual Environment
+```bash
+python -m venv .venv
+ ```
 
-**### Steps**
+3. Activate Environment
+```bash
+.venv\Scripts\activate
+ ```
 
-1. Clone the repository:
+4. Install Dependencies
+```bash
+pip install -r requirements.txt
+ ```
 
-        ```bash
-        git clone  https://github.comSemerNahdiTunisia-Real-Estate-Scraper-Dashboard.git
-        cd Tunisia-Real-Estate-Scraper-Dashboard
-        ```
-
-2. Create a virtual environment:
-
-        ```bash
-        python -m venv .venv
-        ```
-
-3. Activate the virtual environment:
-
-        - Windows:
-
-        ```bash
-        .venv\Scripts\activate
-        ```
-
-        - macOS/Linux:
-
-        ```bash
-        source .venv/bin/activate
-        ```
-
-4. Install dependencies:
-
-        ```bash
-        pip install -r requirements.txt
-        ```
-
-**## 🚀 Running the Application**
-
-1. Navigate to the project directory
-
-2. Activate the virtual environment (if not already done)
-
-3. Run the application:
-
+## 🚀 Usage
+1. Start Application
 ```bash
 cd app
 python -m app.main
-```
+ ```
 
-4. Access the dashboard in your browser:
-
-```
+2. Access Dashboard
+```plaintext
 http://localhost:8050
+ ```
 
-```
-
-**## 📁 Project Structure**
-
+## 📁 Project Structure
+```plaintext
 Tunisia-Real-Estate-Scraper-Dashboard/
-│
-├── app/                                # 📦 Core Application Folder
-│   ├── assets/                         # 🎨 Static assets like CSS
-│   │   └── styles.css                  # 🎨 Custom dashboard styling
-│   ├── config.py                       # ⚙️ Global configuration settings
-│   ├── main.py                         # 🚀 Entry point for running the app
-│   ├── data_processor.py               # 🧹 Data cleaning and preprocessing logic
-│   ├── graphs.py                       # 📊 Functions to generate Plotly charts
-│   ├── layouts.py                      # 🧱 Page structure and layout components
-│   └── utils.py                        # 🛠️  Reusable helper functions
-│
-├── requirements.txt                    # 📦 Python dependencies
-├── README.md                           # 📘 Project overview and usage guide
+├── app/                    # Application Core
+│   ├── assets/            # Static Files
+│   │   └── styles.css     # Custom Styling
+│   ├── config.py          # Configuration
+│   ├── main.py           # Entry Point
+│   ├── data_processor.py  # Data Processing
+│   ├── graphs.py         # Chart Generation
+│   ├── layouts.py        # UI Components
+│   └── utils.py          # Helper Functions
+├── requirements.txt       # Dependencies
+└── README.md             # Documentation
+ ```
 
+## 🔗 Available Routes Route Description /
 
+Dashboard Homepage /new-listings
 
-**## 🔗 Available Pages**
+Recent Properties /price-filter
 
-- `/` - Homepage with statistics and new listings
-- `/new-listings` - List of new property listings
-- `/price-filter` - Price-based filtering and analysis
+Price Analysis /date-filter
 
-**## 📚 Main Dependencies**
+Date-based Search /all-listings
 
-- [Dash](https://dash.plotly.com/) - Framework for interactive web applications
-- [Dash Bootstrap Components](https://dash-bootstrap-components.opensource.faculty.ai/) - Bootstrap UI components
-- [Pandas](https://pandas.pydata.org/) - Data manipulation and analysis
-- [Plotly](https://plotly.com/) - Interactive visualizations
+Complete Inventory
+## 📚 Core Dependencies Package Purpose Dash
 
-**## 📄 License**
+Web Framework Plotly
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+Visualizations Pandas
 
+Data Analysis MongoDB
+
+Database
+## 📄 License
+This project is licensed under the MIT License - see the LICENSE file for details.
